@@ -25,20 +25,15 @@ public final class ContaPoupanca extends Contas{
     public void Saque(double valor) {
     balance -= valor;
 }
-    public void addPoupancaa(ContaPoupanca x){
-        this.todasContas.add(x);
-    }
-    public void removePoupanca(ContaPoupanca x){
-        this.todasContas.remove(x);
-    }
-    public List<Contas> getContasPoupanca() {
-        return this.todasContas;
-    }
+
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ContaPoupanca{");
-        sb.append("juros=").append(juros);
+        final StringBuilder sb = new StringBuilder("Contas Poupanca{");
+        sb.append("titular='").append(getTitular()).append('\'');
+        sb.append(", numero=").append(getNumero());
+        sb.append(", balance=").append(getBalance());
+        sb.append(" Juros=").append(juros);
         sb.append('}');
         return sb.toString();
     }
