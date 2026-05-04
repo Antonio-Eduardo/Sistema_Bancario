@@ -1,6 +1,7 @@
 package Banco_Contas;
 
-import java.util.List;
+import Excecoes.LimiteExcedidoException;
+import Excecoes.SaldoInsuficienteException;
 
 public final class ContaPoupanca extends Contas {
     private static final double TAXA_JUROS = 1.1;
@@ -30,24 +31,29 @@ public final class ContaPoupanca extends Contas {
 
     public void Saque(double valor) {
         if (valor <= balance){
-        balance -= valor;}
+        balance -= valor;
+        }
         else {
-            System.out.println("Saldo insuficiente");
+            throw new SaldoInsuficienteException();
         }
     }
     @Override
     public void Depositar(double valor){
-        balance += valor;
+        if (valor <= 15000) {
+            balance += valor;
+        }else {
+            throw new LimiteExcedidoException();
+        }
     }
 
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Contas [Poupanca] {");
-        sb.append("titular='").append(getTitular()).append('\'');
-        sb.append(", numero=").append(getNumero());
-        sb.append(", saldo=").append(getBalance());
-        sb.append(", rendimento previsto=").append(balance * TAXA_JUROS);
+        sb.append("titular= '").append(getTitular()).append('\'');
+        sb.append(", numero= ").append(getNumero());
+        sb.append(", saldo= ").append(getBalance());
+        sb.append(", rendimento previsto= ").append(balance * TAXA_JUROS);
         sb.append('}');
         return sb.toString();
     }

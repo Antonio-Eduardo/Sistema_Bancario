@@ -1,4 +1,4 @@
-package Banco_Contas;
+package Excecoes;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;

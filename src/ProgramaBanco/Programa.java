@@ -1,10 +1,11 @@
 package ProgramaBanco;
 
 import Banco_Contas.*;
+import Excecoes.ConsoleException;
+import Excecoes.NegocioException;
+import Excecoes.ValidacaoException;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -57,7 +58,6 @@ public class Programa {
             System.out.println("1-Deposito | 2-Saque | 3-sair");
             opcao2 = sc.nextInt();
             sc.nextLine();
-            if (opcao2 == 3) break;
 
             int numeroConta = ConsoleException.lerInteiros(sc, "Digite o numero da conta que deseja realizar o deposito: ");
             Contas procura = todasContas.stream().filter(c -> c.getNumero().equals(numeroConta)).findFirst().orElse(null);
@@ -69,11 +69,11 @@ public class Programa {
                 switch (opcao2) {
                     case 1:
                         double valorDep = ConsoleException.lerDouble(sc, "Ola " + procura.getTitular() + " digite o valor a ser depositado: ");
-                        procura.Depositar(valorDep);
+                        NegocioException.executar(() -> procura.Depositar(valorDep));
                         break;
                     case 2:
                         double valorSaq = ConsoleException.lerDouble(sc, "Ola " + procura.getTitular() + " digite o valor a ser sacado: ");
-                        procura.Saque(valorSaq);
+                        NegocioException.executar(() -> procura.Saque(valorSaq));
                         break;
                     case 3:
                         break;
