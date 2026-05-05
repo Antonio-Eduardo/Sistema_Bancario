@@ -1,9 +1,5 @@
 package Banco_Contas;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
 public abstract class Contas {
     private Integer numero;
     private String titular;
@@ -17,13 +13,12 @@ public abstract class Contas {
         this.numero = numero;
         this.balance = balance;
     }
-
-    public abstract void Depositar(double deposito);
-
-    public abstract void Saque(double saque);
-
     public double getBalance() {
         return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 
     public Integer getNumero() {
@@ -38,7 +33,7 @@ public abstract class Contas {
     public String toString() {
         final StringBuilder sb = new StringBuilder("titular='").append(titular).append('\'');
         sb.append(", numero=").append(numero);
-        sb.append(", balance=").append(balance);
+        sb.append(", Saldo=").append(balance);
         return sb.toString();
     }
 }

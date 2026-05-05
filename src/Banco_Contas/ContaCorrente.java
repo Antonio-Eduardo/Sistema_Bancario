@@ -15,23 +15,6 @@ public class ContaCorrente extends Contas {
     }
 
     @Override
-    public void Saque(double valor) {
-        if (valor + 3.00 <= balance) {
-            double taxa = valor + 3.00;
-            balance -= taxa;
-        } else {
-            throw new SaldoInsuficienteException();
-        }
-    }
-    @Override
-    public void Depositar(double valor) {
-        if (valor <= 10000) {
-            balance += valor;
-        } else {
-            throw new LimiteExcedidoException();
-        }
-    }
-    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Conta [Corrente] {");
         sb.append(" Nome: ").append(super.getTitular());

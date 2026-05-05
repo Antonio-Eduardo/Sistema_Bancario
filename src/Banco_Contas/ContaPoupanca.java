@@ -27,31 +27,10 @@ public final class ContaPoupanca extends Contas {
         return TAXA_JUROS;
     }
 
-
-    public void Saque(double valor) {
-        if (valor <= balance){
-        balance -= valor;
-        }
-        else {
-            throw new SaldoInsuficienteException();
-        }
-    }
-    @Override
-    public void Depositar(double valor){
-        if (valor <= 15000) {
-            balance += valor;
-        }else {
-            throw new LimiteExcedidoException();
-        }
-    }
-
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Contas [Poupanca] {");
-        sb.append("titular= '").append(getTitular()).append('\'');
-        sb.append(", numero= ").append(getNumero());
-        sb.append(", saldo= ").append(getBalance());
+        sb.append(super.toString());
         sb.append(", rendimento previsto= ").append(balance * TAXA_JUROS);
         sb.append('}');
         return sb.toString();
