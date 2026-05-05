@@ -72,7 +72,7 @@ public class Programa {
                         break;
                     } else {
                         double valorDep = ConsoleException.lerDouble(sc, "Ola " + procuraDep.getTitular() + " digite o valor a ser depositado: ");
-                        SistemaOperacaoBanco service = new SistemaOperacaoBanco(valorDep);
+                        SistemaOperacaoBanco service = new SistemaOperacaoBanco();
                         NegocioException.executar(() -> service.processDeposito(procuraDep,valorDep));
                         break;
                     }
@@ -86,7 +86,7 @@ public class Programa {
                         break;
                     } else {
                         double valorSaq = ConsoleException.lerDouble(sc, "Ola " + procuraSaq.getTitular() + " digite o valor a ser sacado: ");
-                        SistemaOperacaoBanco service = new SistemaOperacaoBanco(valorSaq);
+                        SistemaOperacaoBanco service = new SistemaOperacaoBanco();
                         NegocioException.executar(() -> service.processSaque(procuraSaq,valorSaq));
                         break;
                     }

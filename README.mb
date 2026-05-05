@@ -1,62 +1,33 @@
-Sistema Bancário em Java
+# Sistema Bancário (Java)
 
-Este projeto consiste em um sistema bancário desenvolvido em Java, com foco na aplicação de Programação Orientada a Objetos (POO), separação de responsabilidades e simulação de operações reais de contas bancárias.
+Projeto simples de um sistema bancário feito em Java para praticar orientação a objetos.
 
- Funcionalidades
+## O que tem no projeto
 
-Criação de contas bancárias:
-
+* Criação de contas:
   * Conta Corrente
   * Conta Empresarial
   * Conta Poupança
 
-Operações financeiras:
-
+* Operações:
   * Depósito
   * Saque
+* Histórico de transações (cada operação é registrada)
+* Tratamento de erros (saldo insuficiente, limite excedido, etc)
+* Salvando dados em arquivo `.txt`
 
-Aplicação de regras específicas por tipo de conta:
+## Estrutura
+* Banco_Contas → classes das contas
+* BancoServicos → regras e operações
+* Excecoes → tratamento de erros
+* ProgramaBanco → execução no console
 
-  * Taxas de operação
-  * Limites de saque e depósito
-  * Controle de saldo
+## Regras de negócio
+* Conta Corrente possui taxa fixa por operação
+* Conta Empresarial possui limite de saque
+* Conta Poupança possui comportamento diferenciado
 
-Registro de histórico de transações:
-
-  * Cada operação gera uma transação
-  * Armazena tipo da operação, valor e saldo após a operação
-
-Tratamento de exceções:
-
-  * Saldo insuficiente
-  * Limite excedido
-  * Validação de entrada de dados
-
-Exportação de dados:
-
-  * Salvamento das contas e operações em arquivo `.txt`
-
-Estrutura do Projeto
-
-O projeto foi organizado em camadas pensando sempre nas boas praticas de um desenvolvedor:
-
-* Banco_Contas: classes de domínio (Conta, ContaCorrente, ContaEmpresarial, ContaPoupanca)
-* BancoServicos: serviços responsáveis por operações bancárias
-* ENUM: tipos de operação
-* Excecoes: tratamento de erros e validações
-* ProgramaBanco: classe principal (interface via console)
-
-os conceitos que apliquei nesse projeto e continuarei adicionando mais a medida que eu for implementando novas funcionalidades:
-* Herança
-* Polimorfismo
-* Encapsulamento
-* Abstração com classes abstratas
-* Separação entre entidades e serviços
-* Tratamento de exceções customizadas
-* Manipulação de arquivos
-
---------Exemplo de saída----------
-
+## Exemplo de saída
 Conta [Corrente]
 Titular: Eduardo
 Número: 1273
@@ -67,13 +38,13 @@ DEPOSITO | R$ 200.00 | Saldo: 200.00
 DEPOSITO | R$ 200.00 | Saldo: 400.00
 SAQUE | R$ 50.00 | Saldo: 350.00
 
-Este projeto foi desenvolvido para praticar conceitos fundamentais de Java e simular um sistema bancário com regras de negócio reais,
-servindo como base para evolução em projetos mais complexos, foi um projeto criado para praticar enumeração e composição, a medida que fui me aprofundando
-fui implementando meus novos conhecimentos nesse projeto e atualmente ele está assim.
+## Como rodar
 
-O que pretendo melhorar futuramente:
-* Implementação de interface gráfica
-* Persistência em banco de dados
-* Sistema de autenticação de usuários
-* Geração de extrato detalhado
-* Histórico com data e hora das transações
+1. Clonar o repositório
+2. Abrir no IntelliJ
+3. Rodar a classe Programa
+
+## Observações
+
+Fiz esse projeto pra praticar herança, polimorfismo e organização de código.
+Ainda dá pra melhorar (interface gráfica, banco de dados, etc), mas já cobre bem a lógica de um sistema bancário básico.
