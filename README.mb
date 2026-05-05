@@ -1,8 +1,8 @@
-# Sistema Bancário em Java
+Sistema Bancário em Java
 
 Este projeto consiste em um sistema bancário desenvolvido em Java, com foco na aplicação de Programação Orientada a Objetos (POO), separação de responsabilidades e simulação de operações reais de contas bancárias.
 
-## Funcionalidades
+ Funcionalidades
 
 Criação de contas bancárias:
 
@@ -32,11 +32,11 @@ Tratamento de exceções:
   * Limite excedido
   * Validação de entrada de dados
 
-* Exportação de dados:
+Exportação de dados:
 
   * Salvamento das contas e operações em arquivo `.txt`
 
-## Estrutura do Projeto
+Estrutura do Projeto
 
 O projeto foi organizado em camadas pensando sempre nas boas praticas de um desenvolvedor:
 
