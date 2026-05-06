@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HistoricoTransacaoTxtRepositorio implements HistoricoTransacaoTxT {
-    private static final String path = "c:\\temp\\HistoricoDeTransacoes.txt";
+    private static final String path = "HistoricoDeTransacoes.txt";
 
     @Override
     public void salvar(Transacao t) {
