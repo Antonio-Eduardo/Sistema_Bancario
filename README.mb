@@ -1,6 +1,8 @@
 # Sistema Bancário (Java)
 
-Projeto simples de um sistema bancário feito em Java para praticar orientação a objetos.
+Projeto de um sistema bancário desenvolvido em Java com foco em Programação Orientada a Objetos,
+simulando operações básicas de uma instituição financeira. O projeto permite a criação e gerenciamento de contas,
+ além da realização de transações como depósitos, saques e consultas de saldo.
 
 ## O que tem no projeto
 
