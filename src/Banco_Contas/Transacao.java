@@ -4,9 +4,11 @@ import ENUM.TipoOperacao;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.UUID;
 
 public class Transacao implements Comparable<Transacao> {
+    private Contas conta;
     private String iD;
     private String idTransacao;
     private TipoOperacao tipoOperacao;

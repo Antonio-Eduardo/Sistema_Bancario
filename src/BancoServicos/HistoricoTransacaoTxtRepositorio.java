@@ -34,6 +34,7 @@ public class HistoricoTransacaoTxtRepositorio implements HistoricoTransacaoTxT {
             String linha;
             while ((linha = br.readLine()) != null){
                 String[] partes = linha.split(";");
+                if (partes.length < 5) continue;
                 String contaId = partes[0];
                 if (contaId.equals(iD)){
                             Transacao t = new Transacao(

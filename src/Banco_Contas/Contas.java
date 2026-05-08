@@ -32,7 +32,8 @@ public abstract class Contas implements Comparable<Contas> {
         return titular;
     }
     public Transacao getUltimaTransacao() {
-        return historicoTransacoes.getLast();
+        if (historicoTransacoes.isEmpty()) return null;
+        return historicoTransacoes.get(historicoTransacoes.size() - 1);
     }
 
     @Override
@@ -55,8 +56,10 @@ public abstract class Contas implements Comparable<Contas> {
         final StringBuilder sb = new StringBuilder("titular= ").append(titular).append('\'');
         sb.append("\nnumero= ").append(idConta);
         sb.append("\nSaldo= ").append(balance);
-        sb.append("\n--- Transacoes ---");
-        ListUtils.printLista(historicoTransacoes);
+        sb.append("\n--- Transacoes ---\n");
+        for (Transacao t : historicoTransacoes){
+            sb.append(t).append("\n");
+        }
         return sb.toString();
     }
  }

@@ -6,6 +6,7 @@ import Banco_Contas.*;
 import Excecoes.ConsoleException;
 import Excecoes.NegocioException;
 import Interfaces.HistoricoTransacaoTxT;
+
 import java.util.*;
 
 public class Programa {
@@ -29,7 +30,7 @@ public class Programa {
                 case 1:
                     NegocioException.executar(() -> {
                         Contas accCorrente = new ContaCorrente(nome, idConta, depositoInicial);
-                        todasContas.put(accCorrente.getIdConta(),accCorrente);
+                        todasContas.put(accCorrente.getIdConta(), accCorrente);
                     });
                     limite++;
                     break;
@@ -37,21 +38,22 @@ public class Programa {
                     double emprestimo = ConsoleException.lerDouble(sc, "Emprestimo inicial: ");
                     NegocioException.executar(() -> {
                         Contas accEmp = new ContaEmpresarial(nome, idConta, depositoInicial, emprestimo);
-                        todasContas.put(accEmp.getIdConta(),accEmp);
+                        todasContas.put(accEmp.getIdConta(), accEmp);
                     });
                     limite++;
                     break;
                 case 3:
                     NegocioException.executar(() -> {
                         Contas accPoup = new ContaPoupanca(nome, idConta, depositoInicial);
-                        todasContas.put(accPoup.getIdConta(),accPoup);
+                        todasContas.put(accPoup.getIdConta(), accPoup);
                     });
                     limite++;
                     break;
                 default:
                     System.out.println("Opção inválida! tente novamente");
             }
-        }while (true) {
+        }
+        while (true) {
             int op2 = ConsoleException.lerInteiros(sc, "1-DEPOSITAR |2-SACAR |3-EXTRATO |4-SAIR\n");
             if (op2 == 4) {
                 break;
@@ -60,11 +62,16 @@ public class Programa {
                 System.out.println("Digite o ID da conta: ");
                 String idBusca = sc.nextLine();
 
+                Contas conta = todasContas.get(idBusca);
+                if (conta == null) {
+                    System.out.println("Conta nao encontrada");
+                    continue;
+                }
                 List<Transacao> transacoes = repo.listarPorConta(idBusca);
-
                 for (Transacao t : transacoes) {
                     System.out.println(t);
                 }
+
             }
             if (op2 == 1 || op2 == 2) {
                 System.out.println("Digite o numero da conta que deseja realizar a operacao: ");
@@ -85,7 +92,6 @@ public class Programa {
                 }
             }
         }
-        System.out.println(todasContas);
         System.out.println(todasContas);
     }
 }

@@ -11,13 +11,19 @@ public class SistemaOperacaoBanco {
     private HistoricoTransacaoTxT repo = new HistoricoTransacaoTxtRepositorio();
 
     public void processDeposito(Contas conta, double valor, String id) {
-        conta.deposito(valor,id);
-        repo.salvar(conta.getUltimaTransacao());
+        conta.deposito(valor, id);
+        Transacao t = conta.getUltimaTransacao();
+        if (t != null) {
+            repo.salvar(t);
+        }
     }
 
     public void processSaque(Contas conta, double valor, String id) {
-        conta.sacar(valor,id);
-        repo.salvar(conta.getUltimaTransacao());
+        conta.sacar(valor, id);
+        Transacao t = conta.getUltimaTransacao();
+        if (t != null) {
+            repo.salvar(t);
+        }
     }
 
     private double buscarTaxa(Contas conta) {
@@ -32,6 +38,7 @@ public class SistemaOperacaoBanco {
         }
         return 0.0;
     }
+
     public ServicoTaxaConta getTax() {
         return tax;
     }

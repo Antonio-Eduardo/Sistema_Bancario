@@ -39,7 +39,7 @@ public class ContaCorrente extends Contas {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Conta [Corrente]\n");
+        final StringBuilder sb = new StringBuilder("\nConta [Corrente]\n");
         sb.append(super.toString());
         return sb.toString();
     }
