@@ -9,16 +9,13 @@ import java.util.UUID;
 public final class  ContaEmpresarial extends Contas{
     private double emprestimo;
 
-    public ContaEmpresarial(){
-        super();
-    }
 
     public ContaEmpresarial(String titular, String idConta, double balance, double emprestimo) {
         super(titular, idConta, balance);
         this.emprestimo = emprestimo;
     }
     @Override
-    public void sacar(double valor,String id){
+    public void sacar(double valor, String id){
         double taxaEmpresa = 50.00;
         if (balance < valor + taxaEmpresa) {
             throw new SaldoInsuficienteException();
@@ -30,7 +27,7 @@ public final class  ContaEmpresarial extends Contas{
         addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance,id));
     }
     @Override
-    public void deposito(double valor,String id){
+    public void deposito(double valor, String id){
         double taxaEmpresa = 50.00;
         if (taxaEmpresa + valor > 35000) {
             throw new LimiteExcedidoException();

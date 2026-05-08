@@ -8,16 +8,14 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class ContaCorrente extends Contas {
-    public ContaCorrente() {
-        super();
-    }
+
 
     public ContaCorrente(String titular, String idConta, double balance) {
         super(titular, idConta, balance);
     }
 
     @Override
-    public void sacar(double valor,String id){
+    public void sacar(double valor, String id){
         double taxaCorrente = 25.00;
         if (balance < valor + taxaCorrente) {
             throw new SaldoInsuficienteException();

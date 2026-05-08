@@ -10,12 +10,12 @@ public class SistemaOperacaoBanco {
 
     private HistoricoTransacaoTxT repo = new HistoricoTransacaoTxtRepositorio();
 
-    public void processDeposito(Contas conta, double valor,String id) {
+    public void processDeposito(Contas conta, double valor, String id) {
         conta.deposito(valor,id);
         repo.salvar(conta.getUltimaTransacao());
     }
 
-    public void processSaque(Contas conta, double valor,String id) {
+    public void processSaque(Contas conta, double valor, String id) {
         conta.sacar(valor,id);
         repo.salvar(conta.getUltimaTransacao());
     }

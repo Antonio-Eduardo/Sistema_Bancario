@@ -9,9 +9,6 @@ import java.util.UUID;
 public final class ContaPoupanca extends Contas {
     private static final double TAXA_JUROS = 1.1;
 
-    public ContaPoupanca() {
-        super();
-    }
 
     public ContaPoupanca(String titular, String idConta, double balance) {
         super(titular, idConta, balance);
@@ -19,7 +16,7 @@ public final class ContaPoupanca extends Contas {
     }
 
     @Override
-    public void sacar(double valor,String id){
+    public void sacar(double valor, String id){
         if (balance < valor) {
             throw new SaldoInsuficienteException();
         }
@@ -27,7 +24,7 @@ public final class ContaPoupanca extends Contas {
         addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance,id));
     }
     @Override
-    public void deposito(double valor,String id){
+    public void deposito(double valor, String id){
         if (valor > 10000) {
             throw new LimiteExcedidoException();
         }

@@ -5,15 +5,13 @@ import Util.ListUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Contas implements Comparable<Contas> {
     private String idConta;
     private String titular;
     protected double balance;
     List<Transacao> historicoTransacoes = new ArrayList<>();
-
-    public Contas() {
-    }
     public void addTransacao(Transacao transacao){
         historicoTransacoes.add(transacao);
     }
@@ -25,19 +23,27 @@ public abstract class Contas implements Comparable<Contas> {
     public double getBalance() {
         return balance;
     }
-
-    public abstract void sacar(double valor,String id);
+    public abstract void sacar(double valor, String id);
     public abstract void deposito(double valor, String id);
-
     public String getIdConta() {
         return idConta;
     }
-
     public String getTitular() {
         return titular;
     }
     public Transacao getUltimaTransacao() {
-        return historicoTransacoes.get(historicoTransacoes.size() - 1);
+        return historicoTransacoes.getLast();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Contas contas)) return false;
+        return Objects.equals(idConta, contas.idConta);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idConta);
     }
 
     @Override
@@ -51,7 +57,6 @@ public abstract class Contas implements Comparable<Contas> {
         sb.append("\nSaldo= ").append(balance);
         sb.append("\n--- Transacoes ---");
         ListUtils.printLista(historicoTransacoes);
-        sb.append("");
         return sb.toString();
     }
-}
+ }

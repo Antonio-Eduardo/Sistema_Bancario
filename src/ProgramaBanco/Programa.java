@@ -3,15 +3,9 @@ package ProgramaBanco;
 import BancoServicos.HistoricoTransacaoTxtRepositorio;
 import BancoServicos.SistemaOperacaoBanco;
 import Banco_Contas.*;
-import ENUM.TipoOperacao;
 import Excecoes.ConsoleException;
 import Excecoes.NegocioException;
 import Interfaces.HistoricoTransacaoTxT;
-import Util.ListUtils;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 public class Programa {
@@ -19,7 +13,8 @@ public class Programa {
         SistemaOperacaoBanco service = new SistemaOperacaoBanco();
         HistoricoTransacaoTxT repo = new HistoricoTransacaoTxtRepositorio();
 
-        List<Contas> todasContas = new ArrayList<>();
+        Map<String, Contas> todasContas = new HashMap<>();
+
         Scanner sc = new Scanner(System.in);
         final int quantidade = ConsoleException.lerInteiros(sc, "quantidade de cadastros: ");
         int limite = 0;
@@ -34,7 +29,7 @@ public class Programa {
                 case 1:
                     NegocioException.executar(() -> {
                         Contas accCorrente = new ContaCorrente(nome, idConta, depositoInicial);
-                        todasContas.add(accCorrente);
+                        todasContas.put(accCorrente.getIdConta(),accCorrente);
                     });
                     limite++;
                     break;
@@ -42,14 +37,14 @@ public class Programa {
                     double emprestimo = ConsoleException.lerDouble(sc, "Emprestimo inicial: ");
                     NegocioException.executar(() -> {
                         Contas accEmp = new ContaEmpresarial(nome, idConta, depositoInicial, emprestimo);
-                        todasContas.add(accEmp);
+                        todasContas.put(accEmp.getIdConta(),accEmp);
                     });
                     limite++;
                     break;
                 case 3:
                     NegocioException.executar(() -> {
                         Contas accPoup = new ContaPoupanca(nome, idConta, depositoInicial);
-                        todasContas.add(accPoup);
+                        todasContas.put(accPoup.getIdConta(),accPoup);
                     });
                     limite++;
                     break;
@@ -74,7 +69,7 @@ public class Programa {
             if (op2 == 1 || op2 == 2) {
                 System.out.println("Digite o numero da conta que deseja realizar a operacao: ");
                 String numeroConta = sc.nextLine();
-                Contas procura = todasContas.stream().filter(c -> c.getIdConta().equals(numeroConta)).findFirst().orElse(null);
+                Contas procura = todasContas.get(numeroConta);
                 if (procura == null) {
                     System.out.println("numero invalido");
                     continue;
@@ -90,7 +85,7 @@ public class Programa {
                 }
             }
         }
-        ListUtils.writeLista(todasContas);
-        ListUtils.printLista(todasContas);
+        System.out.println(todasContas);
+        System.out.println(todasContas);
     }
 }

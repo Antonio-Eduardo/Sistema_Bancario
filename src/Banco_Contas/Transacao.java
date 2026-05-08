@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class Transacao implements Comparable<Transacao> {
-    private String  iD;
+    private String iD;
     private String idTransacao;
     private TipoOperacao tipoOperacao;
     private double valor;
@@ -23,7 +23,7 @@ public class Transacao implements Comparable<Transacao> {
         this.data = LocalDateTime.now();
     }
 
-    public Transacao(String iD, TipoOperacao tipoOperacao, double valor, double saldoApos ,LocalDateTime data) {
+    public Transacao(String iD, TipoOperacao tipoOperacao, double valor, double saldoApos , LocalDateTime data) {
         this.iD = iD;
         this.tipoOperacao = tipoOperacao;
         this.valor = valor;
