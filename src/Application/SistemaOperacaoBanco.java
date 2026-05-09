@@ -1,9 +1,8 @@
-package BancoServicos;
+package Application;
 
+import Repository.HistoricoTransacaoTxtRepositorio;
 import Banco_Contas.*;
-import Excecoes.LimiteExcedidoException;
-import Excecoes.SaldoInsuficienteException;
-import Interfaces.HistoricoTransacaoTxT;
+import Services.HistoricoTransacaoTxT;
 
 public class SistemaOperacaoBanco {
     private ServicoTaxaConta tax;

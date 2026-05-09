@@ -1,7 +1,7 @@
-package BancoServicos;
+package Repository;
 import Banco_Contas.Transacao;
 import ENUM.TipoOperacao;
-import Interfaces.HistoricoTransacaoTxT;
+import Services.HistoricoTransacaoTxT;
 
 import java.io.*;
 import java.time.LocalDateTime;

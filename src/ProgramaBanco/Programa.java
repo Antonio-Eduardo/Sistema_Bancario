@@ -1,11 +1,11 @@
 package ProgramaBanco;
 
-import BancoServicos.HistoricoTransacaoTxtRepositorio;
-import BancoServicos.SistemaOperacaoBanco;
+import Repository.HistoricoTransacaoTxtRepositorio;
+import Application.SistemaOperacaoBanco;
 import Banco_Contas.*;
-import Excecoes.ConsoleException;
+import Application.ConsoleException;
 import Excecoes.NegocioException;
-import Interfaces.HistoricoTransacaoTxT;
+import Services.HistoricoTransacaoTxT;
 
 import java.util.*;
 

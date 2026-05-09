@@ -1,4 +1,4 @@
-package BancoServicos;
+package Application;
 
 public class ServicoTaxaConta {
 

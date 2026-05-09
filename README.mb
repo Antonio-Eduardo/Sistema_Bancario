@@ -20,7 +20,7 @@ simulando operações básicas de uma instituição financeira. O projeto permit
 
 ## Estrutura
 * Banco_Contas → classes das contas
-* BancoServicos → regras e operações
+* Repository → regras e operações
 * Excecoes → tratamento de erros
 * ProgramaBanco → execução no console
 
