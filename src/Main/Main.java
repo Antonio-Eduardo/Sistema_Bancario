@@ -1,4 +1,4 @@
-package ProgramaBanco;
+package Main;
 
 import Repository.HistoricoTransacaoTxtRepositorio;
 import Application.SistemaOperacaoBanco;
@@ -9,7 +9,7 @@ import Services.HistoricoTransacaoTxT;
 
 import java.util.*;
 
-public class Programa {
+public class Main {
     public static void main(String[] args) {
         SistemaOperacaoBanco service = new SistemaOperacaoBanco();
         HistoricoTransacaoTxT repo = new HistoricoTransacaoTxtRepositorio();
