@@ -6,11 +6,13 @@ import Excecoes.SaldoInsuficienteException;
 import Services.Tax;
 
 public class ContaCorrente extends Contas implements Tax {
-    public ContaCorrente(String titular, String idConta, double balance) {
-        super(titular, idConta, balance);
+    public ContaCorrente(String titular, double balance) {
+        super(titular, balance);
     }
+
+    public ContaCorrente(String titular,Long id, double balance){super(id,titular,balance);}
     @Override
-    public void sacar(double valor, String id){
+    public void sacar(double valor, long id){
         double taxaCorrente = 25.00;
         if (balance < valor + taxaCorrente) {
             throw new SaldoInsuficienteException();
@@ -22,7 +24,7 @@ public class ContaCorrente extends Contas implements Tax {
         addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance,id));
     }
     @Override
-    public void deposito(double valor, String id){
+    public void deposito(double valor, long id){
         if (tax(valor)+valor > 25000) {
             throw new LimiteExcedidoException();
         }

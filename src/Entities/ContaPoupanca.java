@@ -7,11 +7,16 @@ import Services.Tax;
 
 public final class ContaPoupanca extends Contas implements Tax {
     private static final double JUROS_RENDIMENTO = 0.008;
-    public ContaPoupanca(String titular, String idConta, double balance) {
-        super(titular, idConta, balance);
+    public ContaPoupanca(String titular, Long idConta, double balance) {
+        super(titular, balance);
     }
+
+    public ContaPoupanca(String titular, double balance) {
+        super(titular, balance);
+    }
+
     @Override
-    public void sacar(double valor, String id){
+    public void sacar(double valor, long id){
         if (balance < valor) {
             throw new SaldoInsuficienteException();
         }
@@ -19,12 +24,15 @@ public final class ContaPoupanca extends Contas implements Tax {
         addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance,id));
     }
     @Override
-    public void deposito(double valor, String id){
+    public void deposito(double valor, long id){
         if (tax(valor) + valor > 10000) {
             throw new LimiteExcedidoException();
         }
         balance += valor - tax(valor);
         addTransacao(new Transacao(TipoOperacao.OPERACAO_DEPOSITO, valor, balance,id));
+    }
+    public double getRendimento(){
+        return balance * JUROS_RENDIMENTO;
     }
     @Override
     public double tax(double valor) {

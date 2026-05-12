@@ -5,24 +5,32 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class Contas{
-    private String idConta;
+    private long idConta;
     private String titular;
     protected double balance;
     private final List<Transacao> historicoTransacoes = new ArrayList<>();
+
     public void addTransacao(Transacao transacao){
         historicoTransacoes.add(transacao);
     }
-    public Contas(String titular, String idConta, double balance) {
+
+    public Contas(String titular, double balance) {
         this.titular = titular;
-        this.idConta = idConta;
         this.balance = balance;
     }
+
+    public Contas(long idConta, String titular, double balance) {
+        this.idConta = idConta;
+        this.titular = titular;
+        this.balance = balance;
+    }
+
     public double getBalance() {
         return balance;
     }
-    public abstract void sacar(double valor, String id);
-    public abstract void deposito(double valor, String id);
-    public String getIdConta() {
+    public abstract void sacar(double valor, long id);
+    public abstract void deposito(double valor, long id);
+    public Long getIdConta() {
         return idConta;
     }
     public String getTitular() {
@@ -37,6 +45,11 @@ public abstract class Contas{
         if (!(o instanceof Contas contas)) return false;
         return Objects.equals(idConta, contas.idConta);
     }
+
+    public void setIdConta(long idConta) {
+        this.idConta = idConta;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(idConta);

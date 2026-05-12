@@ -8,12 +8,18 @@ import Services.Tax;
 public final class  ContaEmpresarial extends Contas implements Tax {
     private double emprestimo;
 
-    public ContaEmpresarial(String titular, String idConta, double balance, double emprestimo) {
-        super(titular, idConta, balance);
+    public ContaEmpresarial(String titular, long idConta, double balance, double emprestimo) {
+        super(titular,balance);
         this.emprestimo = emprestimo;
     }
+
+    public ContaEmpresarial(String titular, double balance, double emprestimo) {
+        super(titular, balance);
+        this.emprestimo = emprestimo;
+    }
+
     @Override
-    public void sacar(double valor, String id){
+    public void sacar(double valor, long id){
         double taxaEmpresa = 50.00;
         if (balance < valor + taxaEmpresa) {
             throw new SaldoInsuficienteException();
@@ -25,7 +31,7 @@ public final class  ContaEmpresarial extends Contas implements Tax {
         addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance,id));
     }
     @Override
-    public void deposito(double valor, String id){
+    public void deposito(double valor, long id){
 
         if (tax(valor) + valor > 35000) {
             throw new LimiteExcedidoException();

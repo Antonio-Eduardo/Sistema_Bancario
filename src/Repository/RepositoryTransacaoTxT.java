@@ -1,7 +1,7 @@
 package Repository;
 import Entities.Transacao;
 import ENUM.TipoOperacao;
-import Services.HistoricoTransacaoTxT;
+import Services.Repository;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class HistoricoTransacaoTxtRepositorio implements HistoricoTransacaoTxT {
+public class RepositoryTransacaoTxT implements Repository<Transacao>{
     private static final String path = "HistoricoDeTransacoes.txt";
     DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     @Override
@@ -27,18 +27,17 @@ public class HistoricoTransacaoTxtRepositorio implements HistoricoTransacaoTxT {
             throw new RuntimeException("Erro ao salvar transacao ", e);
         }
     }
-    @Override
-    public List<Transacao> listarPorConta(String iD) {
+    public List<Transacao> listarPorConta(long iD) {
         List<Transacao> lista = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader(path))){
             String linha;
             while ((linha = br.readLine()) != null){
                 String[] partes = linha.split(";");
                 if (partes.length < 5) continue;
-                String contaId = partes[0];
+                Long contaId = Long.parseLong(partes[0]);
                 if (contaId.equals(iD)){
                             Transacao t = new Transacao(
-                            partes[0],
+                            Long.parseLong(partes[0]),
                             TipoOperacao.valueOf(partes[1]),
                             Double.parseDouble(partes[2]),
                             Double.parseDouble(partes[3]),

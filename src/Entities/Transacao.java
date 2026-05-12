@@ -7,14 +7,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class Transacao{
-    private String iD;
+    private long iD;
     private String idTransacao;
     private TipoOperacao tipoOperacao;
     private double valor;
     private double saldoApos;
     private LocalDateTime data;
 
-    public Transacao(TipoOperacao tipoOperacao, double valor, double saldoApos, String iD) {
+    public Transacao(TipoOperacao tipoOperacao, double valor, double saldoApos, long iD) {
         this.idTransacao = UUID.randomUUID().toString();
         this.tipoOperacao = tipoOperacao;
         this.valor = valor;
@@ -23,7 +23,7 @@ public class Transacao{
         this.data = LocalDateTime.now();
     }
 
-    public Transacao(String iD, TipoOperacao tipoOperacao, double valor, double saldoApos , LocalDateTime data) {
+    public Transacao(long iD, TipoOperacao tipoOperacao, double valor, double saldoApos , LocalDateTime data) {
         this.iD = iD;
         this.tipoOperacao = tipoOperacao;
         this.valor = valor;
@@ -34,11 +34,11 @@ public class Transacao{
         return idTransacao;
     }
 
-    public String getiD() {
+    public long getiD() {
         return iD;
     }
 
-    public void setiD(String iD) {
+    public void setiD(long iD) {
         this.iD = iD;
     }
 

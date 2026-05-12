@@ -2,5 +2,6 @@ package Excecoes;
 
 public enum ErrorCode {
     SALDO_BAIXO,
-    LIMITE_EXCEDIDO;
+    LIMITE_EXCEDIDO,
+    DB_EXCEPTION;
 }
