@@ -1,4 +1,4 @@
-package Excecoes;
+package exceptions;
 
 public class SaldoInsuficienteException extends ValidacaoException {
 

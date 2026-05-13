@@ -1,11 +1,11 @@
-package Entities;
+package entities;
 
-import ENUM.TipoOperacao;
-import Excecoes.LimiteExcedidoException;
-import Excecoes.SaldoInsuficienteException;
+import enums.TipoOperacao;
+import exceptions.LimiteExcedidoException;
+import exceptions.SaldoInsuficienteException;
 import Services.Tax;
 
-public final class ContaPoupanca extends Contas implements Tax {
+public final class ContaPoupanca extends Conta implements Tax {
     private static final double JUROS_RENDIMENTO = 0.008;
     public ContaPoupanca(String titular, Long idConta, double balance) {
         super(titular, balance);

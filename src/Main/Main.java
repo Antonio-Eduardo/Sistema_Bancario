@@ -1,10 +1,10 @@
 package Main;
 
 import Repository.RepositoryTransacaoTxT;
-import Application.SistemaOperacaoBanco;
-import Entities.*;
-import Application.ConsoleException;
-import Excecoes.NegocioException;
+import applications.SistemaOperacaoBanco;
+import entities.*;
+import applications.ConsoleException;
+import exceptions.NegocioException;
 import Repository.RepositoryContasMySQL;
 import Repository.RepositoryTransacaoMySQL;
 
@@ -17,45 +17,53 @@ public class Main {
         RepositoryContasMySQL repoContasSQL = new RepositoryContasMySQL();
         RepositoryTransacaoMySQL repoTransacoesSQL = new RepositoryTransacaoMySQL();
 
-        Map<Long, Contas> todasContas = new HashMap<>();
+        Map<Long, Conta> todasContas = new HashMap<>();
 
         Scanner sc = new Scanner(System.in);
-        final int quantidade = ConsoleException.lerInteiros(sc, "quantidade de cadastros: ");
-        int limite = 0;
-        int opcao;
-        while (limite < quantidade) {
-            String nome = ConsoleException.lerString(sc, "Nome titular: ");
-            System.out.print("iD da conta: ");
-            double depositoInicial = ConsoleException.lerDouble(sc, "Realize um deposito iniciaL: ");
-            opcao = ConsoleException.lerInteiros(sc, "Selecione o tipo de conta (1-Conta corrente|2-Conta empresarial|3-Conta poupanca)\n");
-            switch (opcao) {
+
+        int escolhaUsu = 0;
+        while (escolhaUsu != 2) {
+            escolhaUsu = ConsoleException.lerInteiros(sc, "[1]Deseja iniciar um cadastro?\n[2]Usuario ja cadastrado?\n");
+            switch (escolhaUsu) {
                 case 1:
-                    NegocioException.executar(() -> {
-                        Contas accCorrente = new ContaCorrente(nome, depositoInicial);
-                        todasContas.put(accCorrente.getIdConta(), accCorrente);
-                        repoContasSQL.salvar(accCorrente);
-                    });
-                    limite++;
+                    String nome = ConsoleException.lerString(sc, "Nome titular: ");
+                    double depositoInicial = ConsoleException.lerDouble(sc, "Realize um deposito iniciaL: ");
+                    int opcao = ConsoleException.lerInteiros(sc, "Selecione o tipo da conta\n[1]-Conta corrente\n[2]-Conta empresarial\n[3]-Conta poupanca)\n");
+                    switch (opcao) {
+                        case 1:
+                            NegocioException.executar(() -> {
+                                Conta accCorrente = new ContaCorrente(nome, depositoInicial);
+                                todasContas.put(accCorrente.getIdConta(), accCorrente);
+                                repoContasSQL.salvar(accCorrente);
+                                System.out.print("Seu iD é: " + accCorrente.getIdConta()+ "\n");
+                            });
+                            break;
+                        case 2:
+                            double emprestimo = ConsoleException.lerDouble(sc, "Emprestimo inicial: ");
+                            NegocioException.executar(() -> {
+                                Conta accEmp = new ContaEmpresarial(nome, depositoInicial, emprestimo);
+                                todasContas.put(accEmp.getIdConta(), accEmp);
+                                repoContasSQL.salvar(accEmp);
+                                System.out.print("Seu iD é: " + accEmp.getIdConta()+ "\n");
+                            });
+                            break;
+                        case 3:
+                            NegocioException.executar(() -> {
+                                Conta accPoup = new ContaPoupanca(nome, depositoInicial);
+                                todasContas.put(accPoup.getIdConta(), accPoup);
+                                repoContasSQL.salvar(accPoup);
+                                System.out.print("Seu iD é: " + accPoup.getIdConta() + "\n");
+                            });
+                            break;
+                        default:
+                            System.out.println("Opção inválida! tente novamente");
+                    }
                     break;
                 case 2:
-                    double emprestimo = ConsoleException.lerDouble(sc, "Emprestimo inicial: ");
-                    NegocioException.executar(() -> {
-                        Contas accEmp = new ContaEmpresarial(nome, depositoInicial, emprestimo);
-                        todasContas.put(accEmp.getIdConta(), accEmp);
-                        repoContasSQL.salvar(accEmp);
-                    });
-                    limite++;
-                    break;
-                case 3:
-                    NegocioException.executar(() -> {
-                        Contas accPoup = new ContaPoupanca(nome, depositoInicial);
-                        todasContas.put(accPoup.getIdConta(), accPoup);
-                        repoContasSQL.salvar(accPoup);
-                    });
-                    limite++;
                     break;
                 default:
-                    System.out.println("Opção inválida! tente novamente");
+                    System.out.println("Numero invalido!");
+                    break;
             }
         }
         while (true) {
@@ -67,28 +75,32 @@ public class Main {
                 System.out.println("Digite o ID da conta: ");
                 long idBusca = sc.nextLong();
 
-                Contas conta = repoContasSQL.buscarPorId(idBusca);
+                Conta conta = repoContasSQL.buscarPorId(idBusca);
                 if (conta == null) {
                     System.out.println("Conta nao encontrada");
                     continue;
                 }
-                List<Transacao> transacoes = repo.listarPorConta(idBusca);
+                List<Transacao> transacoes = repoTransacoesSQL.extrato(conta.getIdConta());
+                for (Transacao t : transacoes){
+                    System.out.println(t + "\n");
+                }
             }
             if (op2 == 1 || op2 == 2) {
                 System.out.println("Digite o numero da conta que deseja realizar a operacao: ");
                 Long numeroConta = sc.nextLong();
-                Contas procura = repoContasSQL.buscarPorId(numeroConta);
+                Conta procura = repoContasSQL.buscarPorId(numeroConta);
                 if (procura == null) {
                     System.out.println("numero invalido");
                     continue;
                 }
                 System.out.println("Ola " + procura.getTitular() + " digite o valor: ");
                 double valor = sc.nextDouble();
-                Long idContaT = procura.getIdConta();
                 if (op2 == 1) {
-                    NegocioException.executar(() -> service.processDeposito(procura, valor, idContaT));
+                    NegocioException.executar(() -> service.processDeposito(procura, valor));
+                    System.out.println("[DEPOSITO CONCLUIDO] FINALIZADO!\n");
                 } else {
-                    NegocioException.executar(() -> service.processSaque(procura, valor, idContaT));
+                    NegocioException.executar(() -> service.processSaque(procura, valor));
+                    System.out.println("[SAQUE CONCLUIDO] FINALIZADO!\n");
                 }
             }
         }

@@ -1,6 +1,6 @@
-package Entities;
+package entities;
 
-import ENUM.TipoOperacao;
+import enums.TipoOperacao;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +21,10 @@ public class Transacao{
         this.saldoApos = saldoApos;
         this.iD = iD;
         this.data = LocalDateTime.now();
+
+    }
+
+    public Transacao() {
     }
 
     public Transacao(long iD, TipoOperacao tipoOperacao, double valor, double saldoApos , LocalDateTime data) {
@@ -32,6 +36,10 @@ public class Transacao{
 
     public String getIdTransacao() {
         return idTransacao;
+    }
+
+    public void setTipoOperacao(TipoOperacao tipoOperacao) {
+        this.tipoOperacao = tipoOperacao;
     }
 
     public long getiD() {
@@ -62,6 +70,10 @@ public class Transacao{
         return valor;
     }
 
+    public void setValor(double valor) {
+        this.valor = valor;
+    }
+
     @Override
     public String toString() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -70,5 +82,9 @@ public class Transacao{
         sb.append(" |saldoApos= ").append(saldoApos);
         sb.append(" |data= ").append(data.format(fmt));
         return sb.toString();
+    }
+
+    public void setData(LocalDateTime data) {
+        this.data = data;
     }
 }

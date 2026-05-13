@@ -1,35 +1,22 @@
 package Repository;
 
-import Entities.ContaCorrente;
-import Entities.ContaEmpresarial;
-import Entities.ContaPoupanca;
-import Entities.Contas;
-import Excecoes.DBException;
+import entities.ContaCorrente;
+import entities.ContaEmpresarial;
+import entities.ContaPoupanca;
+import entities.Conta;
+import exceptions.DBException;
 import Services.Repository;
 import db.DB;
 
 import java.sql.*;
 
-public class RepositoryContasMySQL implements Repository<Contas> {
-    Connection conn = null;
-    ResultSet rs = null;
-    PreparedStatement st = null;
+public class RepositoryContasMySQL implements Repository<Conta> {
 
     @Override
-    public void salvar(Contas t) {
-        try {
-            Connection conn;
-            ResultSet rs;
-            PreparedStatement st;
-
-            conn = DB.getConnection();
-            st = conn.prepareStatement(
-                    "INSERT INTO contas"
-                            + "(titular, balance, emprestimo, rendimento, id_tipo)"
-                            + "VALUES "
-                            + "(?,?,?,?,?)",
-                    Statement.RETURN_GENERATED_KEYS);
-
+    public void salvar(Conta t) {
+        String sql = "INSERT INTO contas (titular, balance, emprestimo, rendimento, id_tipo) VALUES(?,?,?,?,?)";
+        try (Connection conn = DB.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             Double emprestimo = null;
             Double rendimento = null;
             if (t instanceof ContaEmpresarial contaEmpresarial) {
@@ -56,21 +43,17 @@ public class RepositoryContasMySQL implements Repository<Contas> {
             }
             int rowsAffected = st.executeUpdate();
             if (rowsAffected > 0) {
-                rs = st.getGeneratedKeys();
-                if (rs.next()) {
-                    long idGerado = rs.getLong(1);
-                    t.setIdConta(idGerado);
+                try (ResultSet rsGenerated = st.getGeneratedKeys()) {
+                    if (rsGenerated.next()) {
+                        t.setIdConta(rsGenerated.getLong(1));
+                    }
                 }
             }
         } catch (SQLException e) {
             throw new DBException();
-        }finally {
-            DB.closeStatement(st);
-            DB.closeResult(rs);
-            DB.closeConnection();
         }
     }
-    public Contas buscarPorId(Long id) {
+    public Conta buscarPorId(Long id) {
         String sql = "SELECT * FROM contas WHERE idConta = ?";
         try (Connection conn = DB.getConnection();
              PreparedStatement st = conn.prepareStatement(sql)) {
@@ -93,28 +76,19 @@ public class RepositoryContasMySQL implements Repository<Contas> {
             }
         }
     catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            DB.closeConnection();
-            DB.closeStatement(st);
-            DB.closeResult(rs);
+            throw new DBException();
         }
         return  null;
     }
     public void updateSaldo(Long id, Double saldo){
-        try {
-            conn = DB.getConnection();
-            st = conn.prepareStatement("UPDATE contas SET balance = ? WHERE idConta = ?");
+        String sql = "UPDATE contas SET balance = ? WHERE idConta = ?";
+        try(Connection conn = DB.getConnection();
+        PreparedStatement st = conn.prepareStatement(sql)){
             st.setDouble(1, saldo);
             st.setLong(2,id);
-
             st.executeUpdate();
-
         } catch (SQLException e) {
             throw new DBException();
-        }finally {
-            DB.closeStatement(st);
-            DB.closeConnection();
         }
     }
     }

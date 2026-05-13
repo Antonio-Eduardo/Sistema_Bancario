@@ -1,11 +1,11 @@
-package Entities;
+package entities;
 
-import ENUM.TipoOperacao;
-import Excecoes.LimiteExcedidoException;
-import Excecoes.SaldoInsuficienteException;
+import enums.TipoOperacao;
+import exceptions.LimiteExcedidoException;
+import exceptions.SaldoInsuficienteException;
 import Services.Tax;
 
-public final class  ContaEmpresarial extends Contas implements Tax {
+public final class  ContaEmpresarial extends Conta implements Tax {
     private double emprestimo;
 
     public ContaEmpresarial(String titular, long idConta, double balance, double emprestimo) {

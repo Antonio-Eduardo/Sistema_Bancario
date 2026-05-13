@@ -19,9 +19,9 @@ simulando operações básicas de uma instituição financeira. O projeto permit
 * Salvando dados em arquivo `.txt`
 
 ## Estrutura
-* Entities → classes das contas
+* entities → classes das contas
 * Repository → regras e operações
-* Excecoes → tratamento de erros
+* exceptions → tratamento de erros
 * Main → execução no console
 
 ## Regras de negócio

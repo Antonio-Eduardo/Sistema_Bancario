@@ -1,12 +1,11 @@
-package Entities;
+package entities;
 
-import ENUM.TipoOperacao;
-import Excecoes.LimiteExcedidoException;
-import Excecoes.SaldoInsuficienteException;
-import Repository.RepositoryContasMySQL;
+import enums.TipoOperacao;
+import exceptions.LimiteExcedidoException;
+import exceptions.SaldoInsuficienteException;
 import Services.Tax;
 
-public class ContaCorrente extends Contas implements Tax {
+public class ContaCorrente extends Conta implements Tax {
     public ContaCorrente(String titular, double balance) {
         super(titular, balance);
     }

@@ -1,6 +1,6 @@
 package Repository;
-import Entities.Transacao;
-import ENUM.TipoOperacao;
+import entities.Transacao;
+import enums.TipoOperacao;
 import Services.Repository;
 
 import java.io.*;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RepositoryTransacaoTxT implements Repository<Transacao>{
     private static final String path = "HistoricoDeTransacoes.txt";
-    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     @Override
     public void salvar(Transacao t) {
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(path,true))){

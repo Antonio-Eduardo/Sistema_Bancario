@@ -1,10 +1,10 @@
-package Entities;
+package entities;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Contas{
+public abstract class Conta {
     private long idConta;
     private String titular;
     protected double balance;
@@ -14,12 +14,12 @@ public abstract class Contas{
         historicoTransacoes.add(transacao);
     }
 
-    public Contas(String titular, double balance) {
+    public Conta(String titular, double balance) {
         this.titular = titular;
         this.balance = balance;
     }
 
-    public Contas(long idConta, String titular, double balance) {
+    public Conta(long idConta, String titular, double balance) {
         this.idConta = idConta;
         this.titular = titular;
         this.balance = balance;
@@ -42,7 +42,7 @@ public abstract class Contas{
     }
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Contas contas)) return false;
+        if (!(o instanceof Conta contas)) return false;
         return Objects.equals(idConta, contas.idConta);
     }
 

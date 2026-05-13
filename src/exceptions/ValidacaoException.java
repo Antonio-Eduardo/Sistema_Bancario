@@ -1,4 +1,4 @@
-package Excecoes;
+package exceptions;
 
 public class ValidacaoException extends RuntimeException{
     private final ErrorCode codigo;

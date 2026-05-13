@@ -1,4 +1,4 @@
-package Excecoes;
+package exceptions;
 
 public class DBException extends  ValidacaoException{
     public DBException() {
