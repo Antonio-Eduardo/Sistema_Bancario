@@ -3,7 +3,7 @@ package entities;
 import enums.TipoOperacao;
 import exceptions.LimiteExcedidoException;
 import exceptions.SaldoInsuficienteException;
-import Services.Tax;
+import service.Tax;
 
 public final class ContaPoupanca extends Conta implements Tax {
     private static final double JUROS_RENDIMENTO = 0.008;

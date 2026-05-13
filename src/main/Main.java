@@ -1,21 +1,22 @@
-package Main;
+package main;
 
-import Repository.RepositoryTransacaoTxT;
-import applications.SistemaOperacaoBanco;
+import dao.ContaDAO;
+import dao.TransacaoDAO;
+import service.OperacaoBanco;
+import service.impl.OperacaoBancoImpl;
 import entities.*;
 import applications.ConsoleException;
 import exceptions.NegocioException;
-import Repository.RepositoryContasMySQL;
-import Repository.RepositoryTransacaoMySQL;
+import dao.impl.ContaDAOImpl;
+import dao.impl.TransacaoDAOImpl;
 
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        SistemaOperacaoBanco service = new SistemaOperacaoBanco();
-        RepositoryTransacaoTxT repo = new RepositoryTransacaoTxT();
-        RepositoryContasMySQL repoContasSQL = new RepositoryContasMySQL();
-        RepositoryTransacaoMySQL repoTransacoesSQL = new RepositoryTransacaoMySQL();
+        ContaDAO repoContasSQL = new ContaDAOImpl();
+        TransacaoDAO repoTransacoesSQL = new TransacaoDAOImpl();
+        OperacaoBanco service = new OperacaoBancoImpl(repoContasSQL,repoTransacoesSQL);
 
         Map<Long, Conta> todasContas = new HashMap<>();
 

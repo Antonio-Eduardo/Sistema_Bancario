@@ -3,7 +3,7 @@ package entities;
 import enums.TipoOperacao;
 import exceptions.LimiteExcedidoException;
 import exceptions.SaldoInsuficienteException;
-import Services.Tax;
+import service.Tax;
 
 public final class  ContaEmpresarial extends Conta implements Tax {
     private double emprestimo;

@@ -1,17 +1,17 @@
-package Repository;
+package dao.impl;
 
+import dao.ContaDAO;
 import entities.ContaCorrente;
 import entities.ContaEmpresarial;
 import entities.ContaPoupanca;
 import entities.Conta;
 import exceptions.DBException;
-import Services.Repository;
 import db.DB;
 import exceptions.DBIntegrityException;
 
 import java.sql.*;
 
-public class RepositoryContasMySQL implements Repository<Conta> {
+public class ContaDAOImpl implements ContaDAO {
 
     @Override
     public void salvar(Conta t) {

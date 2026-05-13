@@ -1,15 +1,15 @@
-package Repository;
+package dao.impl;
 
+import dao.TransacaoDAO;
 import enums.TipoOperacao;
 import entities.Transacao;
-import Services.Repository;
 import db.DB;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositoryTransacaoMySQL implements Repository<Transacao> {
+public class TransacaoDAOImpl implements TransacaoDAO {
     @Override
     public void salvar(Transacao t) {
         String sql = "INSERT INTO transacoes (id_operacao, valor, id_conta) VALUES (?,?,?)";

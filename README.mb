@@ -20,9 +20,9 @@ simulando operações básicas de uma instituição financeira. O projeto permit
 
 ## Estrutura
 * entities → classes das contas
-* Repository → regras e operações
+* dao → regras e operações
 * exceptions → tratamento de erros
-* Main → execução no console
+* main → execução no console
 
 ## Regras de negócio
 * Conta Corrente possui taxa fixa por operação

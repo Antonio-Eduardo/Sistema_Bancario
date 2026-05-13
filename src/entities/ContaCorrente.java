@@ -3,7 +3,7 @@ package entities;
 import enums.TipoOperacao;
 import exceptions.LimiteExcedidoException;
 import exceptions.SaldoInsuficienteException;
-import Services.Tax;
+import service.Tax;
 
 public class ContaCorrente extends Conta implements Tax {
     public ContaCorrente(String titular, double balance) {
