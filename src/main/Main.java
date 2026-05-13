@@ -1,15 +1,14 @@
 package main;
 
+import factory.ContaFactory;
 import dao.ContaDAO;
 import dao.DaoFactory;
 import dao.TransacaoDAO;
 import service.OperacaoBanco;
-import service.impl.OperacaoBancoImpl;
+import factory.OperacaoFactory;
 import entities.*;
-import applications.ConsoleException;
+import util.ConsoleInput;
 import exceptions.NegocioException;
-import dao.impl.ContaDAOImpl;
-import dao.impl.TransacaoDAOImpl;
 
 import java.util.*;
 
@@ -17,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         ContaDAO repoContasSQL = DaoFactory.criarContaDAO();
         TransacaoDAO repoTransacoesSQL = DaoFactory.criarTransDAO();
-        OperacaoBanco service = new OperacaoBancoImpl(repoContasSQL,repoTransacoesSQL);
+        OperacaoBanco service = OperacaoFactory.operacaoBanco(repoContasSQL,repoTransacoesSQL);
 
         Map<Long, Conta> todasContas = new HashMap<>();
 
@@ -25,25 +24,25 @@ public class Main {
 
         int escolhaUsu = 0;
         while (escolhaUsu != 2) {
-            escolhaUsu = ConsoleException.lerInteiros(sc, "[1]Deseja iniciar um cadastro?\n[2]Usuario ja cadastrado?\n");
+            escolhaUsu = ConsoleInput.lerInteiros(sc, "[1]Deseja iniciar um cadastro?\n[2]Usuario ja cadastrado?\n");
             switch (escolhaUsu) {
                 case 1:
-                    String nome = ConsoleException.lerString(sc, "Nome titular: ");
-                    double depositoInicial = ConsoleException.lerDouble(sc, "Realize um deposito iniciaL: ");
-                    int opcao = ConsoleException.lerInteiros(sc, "Selecione o tipo da conta\n[1]-Conta corrente\n[2]-Conta empresarial\n[3]-Conta poupanca)\n");
+                    String nome = ConsoleInput.lerString(sc, "Nome titular: ");
+                    double depositoInicial = ConsoleInput.lerDouble(sc, "Realize um deposito iniciaL: ");
+                    int opcao = ConsoleInput.lerInteiros(sc, "Selecione o tipo da conta\n[1]-Conta corrente\n[2]-Conta empresarial\n[3]-Conta poupanca)\n");
                     switch (opcao) {
                         case 1:
                             NegocioException.executar(() -> {
-                                Conta accCorrente = new ContaCorrente(nome, depositoInicial);
+                                Conta accCorrente = ContaFactory.criarContaCorrente(nome, depositoInicial);
                                 todasContas.put(accCorrente.getIdConta(), accCorrente);
                                 repoContasSQL.salvar(accCorrente);
                                 System.out.print("Seu iD é: " + accCorrente.getIdConta()+ "\n");
                             });
                             break;
                         case 2:
-                            double emprestimo = ConsoleException.lerDouble(sc, "Emprestimo inicial: ");
+                            double emprestimo = ConsoleInput.lerDouble(sc, "Emprestimo inicial: ");
                             NegocioException.executar(() -> {
-                                Conta accEmp = new ContaEmpresarial(nome, depositoInicial, emprestimo);
+                                Conta accEmp = ContaFactory.criarContaEmpresa(nome, depositoInicial, emprestimo);
                                 todasContas.put(accEmp.getIdConta(), accEmp);
                                 repoContasSQL.salvar(accEmp);
                                 System.out.print("Seu iD é: " + accEmp.getIdConta()+ "\n");
@@ -51,7 +50,7 @@ public class Main {
                             break;
                         case 3:
                             NegocioException.executar(() -> {
-                                Conta accPoup = new ContaPoupanca(nome, depositoInicial);
+                                Conta accPoup = ContaFactory.criarContaPoupanca(nome, depositoInicial);
                                 todasContas.put(accPoup.getIdConta(), accPoup);
                                 repoContasSQL.salvar(accPoup);
                                 System.out.print("Seu iD é: " + accPoup.getIdConta() + "\n");
@@ -69,7 +68,7 @@ public class Main {
             }
         }
         while (true) {
-            int op2 = ConsoleException.lerInteiros(sc, "1-DEPOSITAR |2-SACAR |3-EXTRATO |4-TRANSFERENCIA |5-SAIR\n");
+            int op2 = ConsoleInput.lerInteiros(sc, "1-DEPOSITAR |2-SACAR |3-EXTRATO |4-TRANSFERENCIA |5-SAIR\n");
             if (op2 == 5) {
                 break;
             }
@@ -107,7 +106,7 @@ public class Main {
                     System.out.println("Digite o numero da conta para que deseja realizar a transferencia: ");
                     Long numeroContaTransf = sc.nextLong();
                     Conta procuraTransf = repoContasSQL.buscarPorId(numeroContaTransf);
-                    int escolhaTransf = ConsoleException.lerInteiros(sc,"Desejar realizar uma transferencia para conta [" + procuraTransf.getTitular() + "] ? [1-SIM|2-CANCELAR]");
+                    int escolhaTransf = ConsoleInput.lerInteiros(sc,"Desejar realizar uma transferencia para conta [" + procuraTransf.getTitular() + "] ? [1-SIM|2-CANCELAR]");
                     if (escolhaTransf == 1) {
                         NegocioException.executar(() -> service.processTransferencia(procura, valor, procuraTransf));
                         System.out.println("[TRANSFERENCIA CONCLUIDO] FINALIZADO!\n");

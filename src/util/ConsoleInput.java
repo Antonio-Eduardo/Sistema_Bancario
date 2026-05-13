@@ -1,9 +1,9 @@
-package applications;
+package util;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class ConsoleException {
+public class ConsoleInput {
 
     public static int lerInteiros(Scanner sc, String mensagem) {
         while (true) {

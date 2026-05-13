@@ -11,10 +11,7 @@ public class OperacaoBancoImpl implements OperacaoBanco {
     private final ContaDAO contaDAO;
     private final TransacaoDAO transacaoDAO;
 
-    public OperacaoBancoImpl(
-            ContaDAO contaDAO,
-            TransacaoDAO transacaoDAO
-    ) {
+    public OperacaoBancoImpl(ContaDAO contaDAO, TransacaoDAO transacaoDAO) {
         this.contaDAO = contaDAO;
         this.transacaoDAO = transacaoDAO;
 
