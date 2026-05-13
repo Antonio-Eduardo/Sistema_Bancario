@@ -1,6 +1,7 @@
 package main;
 
 import dao.ContaDAO;
+import dao.DaoFactory;
 import dao.TransacaoDAO;
 import service.OperacaoBanco;
 import service.impl.OperacaoBancoImpl;
@@ -14,8 +15,8 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        ContaDAO repoContasSQL = new ContaDAOImpl();
-        TransacaoDAO repoTransacoesSQL = new TransacaoDAOImpl();
+        ContaDAO repoContasSQL = DaoFactory.criarContaDAO();
+        TransacaoDAO repoTransacoesSQL = DaoFactory.criarTransDAO();
         OperacaoBanco service = new OperacaoBancoImpl(repoContasSQL,repoTransacoesSQL);
 
         Map<Long, Conta> todasContas = new HashMap<>();
@@ -116,6 +117,7 @@ public class Main {
                 }
             }
         }
-        System.out.println(todasContas);
+        todasContas.forEach((iD, conta) ->
+                System.out.println(iD + " = " + conta));
     }
 }

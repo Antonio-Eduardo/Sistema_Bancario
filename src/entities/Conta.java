@@ -60,7 +60,7 @@ public abstract class Conta {
     }
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("titular= ").append(titular).append('\'');
+        final StringBuilder sb = new StringBuilder("\ntitular= ").append(titular).append('\'');
         sb.append("\nnumero= ").append(idConta);
         sb.append("\nSaldo= ").append(balance);
         sb.append("\n--- Transacoes ---\n");

@@ -54,7 +54,7 @@ public final class ContaPoupanca extends Conta implements Tax {
     public String toString() {
         final StringBuilder sb = new StringBuilder("\nContas [Poupanca]\n");
         sb.append(super.toString());
-        sb.append("\nrendimento previsto= ").append(balance * JUROS_RENDIMENTO);
+        sb.append("\nRendimento previsto= ").append(balance * JUROS_RENDIMENTO);
 
         return sb.toString();
     }
