@@ -1,30 +1,37 @@
 package entities;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Conta {
-    private long idConta;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long idConta;
     private String titular;
     protected double balance;
-    private final List<Transacao> historicoTransacoes = new ArrayList<>();
 
-    public void addTransacao(Transacao transacao){
+    @Transient
+    private final List<entities.Transacao> historicoTransacoes = new ArrayList<>();
+
+    public void addTransacao(entities.Transacao transacao){
         historicoTransacoes.add(transacao);
     }
+
+    public Conta(){}
 
     public Conta(String titular, double balance) {
         this.titular = titular;
         this.balance = balance;
     }
-
-    public Conta(long idConta, String titular, double balance) {
+    public Conta(Long idConta, String titular, double balance) {
         this.idConta = idConta;
         this.titular = titular;
         this.balance = balance;
     }
-
     public double getBalance() {
         return balance;
     }
@@ -37,7 +44,7 @@ public abstract class Conta {
     public String getTitular() {
         return titular;
     }
-    public Transacao getUltimaTransacao() {
+    public entities.Transacao getUltimaTransacao() {
         if (historicoTransacoes.isEmpty()) return null;
         return historicoTransacoes.get(historicoTransacoes.size() - 1);
     }
@@ -50,7 +57,7 @@ public abstract class Conta {
         balance += valor;
     }
 
-    public void setIdConta(long idConta) {
+    public void setIdConta(Long idConta) {
         this.idConta = idConta;
     }
 
@@ -64,7 +71,7 @@ public abstract class Conta {
         sb.append("\nnumero= ").append(idConta);
         sb.append("\nSaldo= ").append(balance);
         sb.append("\n--- Transacoes ---\n");
-        for (Transacao t : historicoTransacoes){
+        for (entities.Transacao t : historicoTransacoes){
             sb.append(t).append("\n");
         }
         return sb.toString();

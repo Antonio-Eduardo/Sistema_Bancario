@@ -1,9 +1,10 @@
+
 import dao.ContaDAO;
 import dao.TransacaoDAO;
-import entities.Conta;
 import entities.Transacao;
 import factory.ContaFactory;
 import factory.DaoFactory;
+import entities.Conta;
 import service.OperacaoBanco;
 import factory.OperacaoFactory;
 import util.ConsoleInput;

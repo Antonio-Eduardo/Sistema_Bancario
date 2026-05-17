@@ -1,9 +1,9 @@
 package factory;
 
-import entities.Conta;
 import entities.ContaCorrente;
 import entities.ContaEmpresarial;
 import entities.ContaPoupanca;
+import entities.Conta;
 
 public class ContaFactory {
     public static Conta criarContaCorrente(String titular, double balance){

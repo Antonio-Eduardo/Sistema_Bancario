@@ -121,7 +121,6 @@ public class ContaDAOImpl implements ContaDAO {
             throw new DBException();
         }
     }
-
     public void deleteConta(Long id) {
         String sql = "DELETE FROM contas WHERE idConta = ?";
         try (Connection conn = DB.getConnection();
