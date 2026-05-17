@@ -1,4 +1,4 @@
-package exceptions;
+package enums;
 
 public enum ErrorCode {
     SALDO_BAIXO,

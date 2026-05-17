@@ -14,10 +14,11 @@ public abstract class Conta {
     private String titular;
     protected double balance;
 
-    @OneToMany(mappedBy = "conta")
-    private final List<entities.Transacao> historicoTransacoes = new ArrayList<>();
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transacao> historicoTransacoes = new ArrayList<>();
 
-    public void addTransacao(entities.Transacao transacao){
+    public void addTransacao(Transacao transacao){
+        transacao.setConta(this);
         historicoTransacoes.add(transacao);
     }
 
@@ -35,9 +36,9 @@ public abstract class Conta {
     public double getBalance() {
         return balance;
     }
-    public abstract void sacar(double valor, long id);
-    public abstract void deposito(double valor, long id);
-    public abstract void transferencia( Double valorTx, Conta contaY);
+    public abstract void sacar(double valor);
+    public abstract void deposito(double valor);
+    public abstract void transferencia( Double valor, Conta contaDestino);
     public Long getIdConta() {
         return idConta;
     }
@@ -53,7 +54,7 @@ public abstract class Conta {
         if (!(o instanceof Conta contas)) return false;
         return Objects.equals(idConta, contas.idConta);
     }
-    protected void creditar(double valor){
+    public void creditar(double valor){
         balance += valor;
     }
 

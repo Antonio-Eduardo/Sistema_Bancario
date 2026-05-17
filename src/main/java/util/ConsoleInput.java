@@ -49,11 +49,11 @@ public class ConsoleInput {
             }
         }
     }
-    public static Long lerLong(Scanner sc, String mensagem) {
+    public static long lerLong(Scanner sc, String mensagem) {
         while (true) {
             try {
                 System.out.print(mensagem);
-                Long valor = sc.nextLong();
+                long valor = sc.nextLong();
                 sc.nextLine();
                 return valor;
             } catch (InputMismatchException e) {

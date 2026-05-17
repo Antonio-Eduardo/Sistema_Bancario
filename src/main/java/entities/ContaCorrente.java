@@ -16,7 +16,7 @@ public class ContaCorrente extends Conta implements Tax {
     public ContaCorrente(String titular,Long id, double balance){super(id,titular,balance);}
 
     @Override
-    public void sacar(double valor, long id){
+    public void sacar(double valor){
         double taxaCorrente = 25.00;
         if (balance < valor + taxaCorrente) {
             throw new SaldoInsuficienteException();
@@ -25,24 +25,24 @@ public class ContaCorrente extends Conta implements Tax {
             throw new LimiteExcedidoException();
         }
         balance -= valor + taxaCorrente;
-        addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance,id));
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance));
     }
     @Override
-    public void deposito(double valor, long id){
+    public void deposito(double valor){
         if (tax(valor)+valor > 25000) {
             throw new LimiteExcedidoException();
         }
         balance += valor - tax(valor);
-        addTransacao(new Transacao(TipoOperacao.OPERACAO_DEPOSITO, valor, balance ,id));
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_DEPOSITO, valor, balance));
     }
     @Override
-    public void transferencia( Double valorTx, Conta contaY) {
-        if (balance >= valorTx + tax(valorTx)) {
-            balance -= valorTx + tax(valorTx);
-            contaY.creditar(valorTx);
+    public void transferencia( Double valor, Conta contaDestino) {
+        if (balance >= valor + tax(valor)) {
+            balance -= valor + tax(valor);
+            contaDestino.creditar(valor);
 
-            addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valorTx, balance, getIdConta()));
-            contaY.addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valorTx, contaY.getBalance(), contaY.getIdConta()));
+            addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, balance));
+            contaDestino.addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, contaDestino.getBalance()));
         } else {
             throw new SaldoInsuficienteException();
         }

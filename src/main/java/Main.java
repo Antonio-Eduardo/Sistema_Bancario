@@ -2,9 +2,13 @@
 import dao.ContaDAO;
 import dao.TransacaoDAO;
 import entities.Transacao;
+import exceptions.DBException;
 import factory.ContaFactory;
 import factory.DaoFactory;
 import entities.Conta;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import service.OperacaoBanco;
 import factory.OperacaoFactory;
 import util.ConsoleInput;
@@ -14,11 +18,12 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        ContaDAO repoContasSQL = DaoFactory.criarContaDAO();
-        TransacaoDAO repoTransacoesSQL = DaoFactory.criarTransDAO();
-        OperacaoBanco service = OperacaoFactory.operacaoBanco(repoContasSQL,repoTransacoesSQL);
 
-        Map<Long, Conta> todasContas = new HashMap<>();
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("sistema-bancario-jpa");
+        EntityManager em = emf.createEntityManager();
+        ContaDAO repoContasSQL = DaoFactory.criarContaDAO(em);
+        TransacaoDAO repoTransacoesSQL = DaoFactory.criarTransDAO(em);
+        OperacaoBanco service = OperacaoFactory.operacaoBanco(repoContasSQL,em);
 
         Scanner sc = new Scanner(System.in);
 
@@ -32,29 +37,51 @@ public class Main {
                     int opcao = ConsoleInput.lerInteiros(sc, "Selecione o tipo da conta\n[1]-Conta corrente\n[2]-Conta empresarial\n[3]-Conta poupanca)\n");
                     switch (opcao) {
                         case 1:
-                            NegocioException.executar(() -> {
-                                Conta accCorrente = ContaFactory.criarContaCorrente(nome, depositoInicial);
-                                todasContas.put(accCorrente.getIdConta(), accCorrente);
-                                repoContasSQL.salvar(accCorrente);
-                                System.out.print("Seu iD é: " + accCorrente.getIdConta()+ "\n");
-                            });
+                                try {
+                                    em.getTransaction().begin();
+                                    Conta accCorrente = ContaFactory.criarContaCorrente(nome, depositoInicial);
+                                    repoContasSQL.salvar(accCorrente);
+                                    em.getTransaction().commit();
+
+                                    System.out.print("Seu iD é: " + accCorrente.getIdConta() + "\n");
+                                }catch (Exception e){
+                                    if (em.getTransaction() != null && em.getTransaction().isActive()){
+                                        em.getTransaction().rollback();
+                                    }
+                                    throw new DBException();
+                                }
                             break;
                         case 2:
                             double emprestimo = ConsoleInput.lerDouble(sc, "Emprestimo inicial: ");
-                            NegocioException.executar(() -> {
+                            try {
+                                em.getTransaction().begin();
                                 Conta accEmp = ContaFactory.criarContaEmpresa(nome, depositoInicial, emprestimo);
-                                todasContas.put(accEmp.getIdConta(), accEmp);
                                 repoContasSQL.salvar(accEmp);
-                                System.out.print("Seu iD é: " + accEmp.getIdConta()+ "\n");
-                            });
+                                em.getTransaction().commit();
+
+                                System.out.print("Seu iD é: " + accEmp.getIdConta() + "\n");
+                            }catch (Exception e){
+                                if (em.getTransaction() != null && em.getTransaction().isActive()){
+                                    em.getTransaction().rollback();
+                                }
+                                throw new DBException();
+                            }
                             break;
                         case 3:
-                            NegocioException.executar(() -> {
+                            try {
+                                em.getTransaction().begin();
                                 Conta accPoup = ContaFactory.criarContaPoupanca(nome, depositoInicial);
-                                todasContas.put(accPoup.getIdConta(), accPoup);
                                 repoContasSQL.salvar(accPoup);
+                                em.getTransaction().commit();
+
                                 System.out.print("Seu iD é: " + accPoup.getIdConta() + "\n");
-                            });
+                            }catch (Exception e){
+                                if (em.getTransaction() != null && em.getTransaction().isActive()){
+                                    em.getTransaction().rollback();
+                                }
+                                throw new DBException();
+                            }
+
                             break;
                         default:
                             System.out.println("Opção inválida! tente novamente");
@@ -73,8 +100,7 @@ public class Main {
                 break;
             }
             if (op2 == 3) {
-                System.out.println("Digite o ID da conta: ");
-                long idBusca = sc.nextLong();
+                long idBusca = ConsoleInput.lerLong(sc,"Digite o ID da conta: ");
 
                 Conta conta = repoContasSQL.buscarPorId(idBusca);
                 if (conta == null) {
@@ -87,36 +113,43 @@ public class Main {
                 }
             }
             if (op2 == 1 || op2 == 2 || op2 == 4) {
-                System.out.println("Digite o numero da conta que deseja realizar a operacao: ");
-                Long numeroConta = sc.nextLong();
+                long numeroConta = ConsoleInput.lerLong(sc,"Digite o numero da conta que deseja realizar a operacao: ");
                 Conta procura = repoContasSQL.buscarPorId(numeroConta);
                 if (procura == null) {
                     System.out.println("numero invalido");
                     continue;
                 }
-                System.out.println("Ola " + procura.getTitular() + " digite o valor: ");
-                double valor = sc.nextDouble();
-                if (op2 == 1) {
-                    NegocioException.executar(() -> service.processDeposito(procura, valor));
-                    System.out.println("[DEPOSITO CONCLUIDO] FINALIZADO!\n");
-                } else if (op2 == 2){
-                    NegocioException.executar(() -> service.processSaque(procura, valor));
-                    System.out.println("[SAQUE CONCLUIDO] FINALIZADO!\n");
-                } else {
-                    System.out.println("Digite o numero da conta para que deseja realizar a transferencia: ");
-                    Long numeroContaTransf = sc.nextLong();
-                    Conta procuraTransf = repoContasSQL.buscarPorId(numeroContaTransf);
-                    int escolhaTransf = ConsoleInput.lerInteiros(sc,"Desejar realizar uma transferencia para conta [" + procuraTransf.getTitular() + "] ? [1-SIM|2-CANCELAR]");
-                    if (escolhaTransf == 1) {
-                        NegocioException.executar(() -> service.processTransferencia(procura, valor, procuraTransf));
-                        System.out.println("[TRANSFERENCIA CONCLUIDO] FINALIZADO!\n");
-                    }else {
-                        System.out.println("OPERACAO CANCELADA!");
+                double valor = ConsoleInput.lerDouble(sc,"Ola " + procura.getTitular() + " digite o valor: ");
+
+                try {
+                    if (op2 == 1) {
+                         service.processDeposito(procura, valor);
+                        System.out.println("[DEPOSITO CONCLUIDO] FINALIZADO!\n");
+                    } else if (op2 == 2) {
+                         service.processSaque(procura, valor);
+                        System.out.println("[SAQUE CONCLUIDO] FINALIZADO!\n");
+                    } else {
+                        long numeroContaTransf = ConsoleInput.lerLong(sc, "Digite o numero da conta para que deseja realizar a transferencia: ");
+                        Conta procuraTransf = repoContasSQL.buscarPorId(numeroContaTransf);
+                        if (procuraTransf == null){
+                            System.out.println("Conta destino nao encontrada");
+                            continue;
+                        }
+                        int escolhaTransf = ConsoleInput.lerInteiros(sc, "Desejar realizar uma transferencia para conta [" + procuraTransf.getTitular() + "] ? [1-SIM|2-CANCELAR]");
+                        if (escolhaTransf == 1) {
+                            service.processTransferencia(procura, valor, procuraTransf);
+                            System.out.println("[TRANSFERENCIA CONCLUIDO] FINALIZADO!\n");
+                        } else {
+                            System.out.println("OPERACAO CANCELADA!");
+                        }
                     }
+                }catch (NegocioException e) {
+                    System.out.println("\n[AVISO DE NEGÓCIO] " + e.getMessage() + "\n");
+                } catch (DBException e) {
+                    System.out.println("\n[SISTEMA] Erro crítico no banco de dados. Operação cancelada.\n");
                 }
             }
         }
-        todasContas.forEach((iD, conta) ->
-                System.out.println(iD + " = " + conta));
+        emf.close();
     }
 }

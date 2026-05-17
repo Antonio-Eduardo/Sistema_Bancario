@@ -1,0 +1,896 @@
+﻿
+import dao.ContaDAO;
+import dao.TransacaoDAO;
+import entities.Transacao;
+import exceptions.DBException;
+import factory.ContaFactory;
+import factory.DaoFactory;
+import entities.Conta;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import service.OperacaoBanco;
+import factory.OperacaoFactory;
+import util.ConsoleInput;
+import exceptions.NegocioException;
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("sistema-bancario-jpa");
+        EntityManager em = emf.createEntityManager();
+        ContaDAO repoContasSQL = DaoFactory.criarContaDAO(em);
+        TransacaoDAO repoTransacoesSQL = DaoFactory.criarTransDAO(em);
+        OperacaoBanco service = OperacaoFactory.operacaoBanco(repoContasSQL,em);
+
+        Scanner sc = new Scanner(System.in);
+
+        int escolhaUsu = 0;
+        while (escolhaUsu != 2) {
+            escolhaUsu = ConsoleInput.lerInteiros(sc, "[1]Deseja iniciar um cadastro?\n[2]Usuario ja cadastrado?\n");
+            switch (escolhaUsu) {
+                case 1:
+                    String nome = ConsoleInput.lerString(sc, "Nome titular: ");
+                    double depositoInicial = ConsoleInput.lerDouble(sc, "Realize um deposito iniciaL: ");
+                    int opcao = ConsoleInput.lerInteiros(sc, "Selecione o tipo da conta\n[1]-Conta corrente\n[2]-Conta empresarial\n[3]-Conta poupanca)\n");
+                    switch (opcao) {
+                        case 1:
+                                try {
+                                    em.getTransaction().begin();
+                                    Conta accCorrente = ContaFactory.criarContaCorrente(nome, depositoInicial);
+                                    repoContasSQL.salvar(accCorrente);
+                                    em.getTransaction().commit();
+
+                                    System.out.print("Seu iD Ã©: " + accCorrente.getIdConta() + "\n");
+                                }catch (Exception e){
+                                    if (em.getTransaction() != null && em.getTransaction().isActive()){
+                                        em.getTransaction().rollback();
+                                    }
+                                    throw new DBException();
+                                }
+                            break;
+                        case 2:
+                            double emprestimo = ConsoleInput.lerDouble(sc, "Emprestimo inicial: ");
+                            try {
+                                em.getTransaction().begin();
+                                Conta accEmp = ContaFactory.criarContaEmpresa(nome, depositoInicial, emprestimo);
+                                repoContasSQL.salvar(accEmp);
+                                em.getTransaction().commit();
+
+                                System.out.print("Seu iD Ã©: " + accEmp.getIdConta() + "\n");
+                            }catch (Exception e){
+                                if (em.getTransaction() != null && em.getTransaction().isActive()){
+                                    em.getTransaction().rollback();
+                                }
+                                throw new DBException();
+                            }
+                            break;
+                        case 3:
+                            try {
+                                em.getTransaction().begin();
+                                Conta accPoup = ContaFactory.criarContaPoupanca(nome, depositoInicial);
+                                repoContasSQL.salvar(accPoup);
+                                em.getTransaction().commit();
+
+                                System.out.print("Seu iD Ã©: " + accPoup.getIdConta() + "\n");
+                            }catch (Exception e){
+                                if (em.getTransaction() != null && em.getTransaction().isActive()){
+                                    em.getTransaction().rollback();
+                                }
+                                throw new DBException();
+                            }
+
+                            break;
+                        default:
+                            System.out.println("OpÃ§Ã£o invÃ¡lida! tente novamente");
+                    }
+                    break;
+                case 2:
+                    break;
+                default:
+                    System.out.println("Numero invalido!");
+                    break;
+            }
+        }
+        while (true) {
+            int op2 = ConsoleInput.lerInteiros(sc, "1-DEPOSITAR |2-SACAR |3-EXTRATO |4-TRANSFERENCIA |5-SAIR\n");
+            if (op2 == 5) {
+                break;
+            }
+            if (op2 == 3) {
+                long idBusca = ConsoleInput.lerLong(sc,"Digite o ID da conta: ");
+
+                Conta conta = repoContasSQL.buscarPorId(idBusca);
+                if (conta == null) {
+                    System.out.println("Conta nao encontrada");
+                    continue;
+                }
+                List<Transacao> transacoes = repoTransacoesSQL.extrato(conta.getIdConta());
+                for (Transacao t : transacoes){
+                    System.out.println(t + "\n");
+                }
+            }
+            if (op2 == 1 || op2 == 2 || op2 == 4) {
+                long numeroConta = ConsoleInput.lerLong(sc,"Digite o numero da conta que deseja realizar a operacao: ");
+                Conta procura = repoContasSQL.buscarPorId(numeroConta);
+                if (procura == null) {
+                    System.out.println("numero invalido");
+                    continue;
+                }
+                double valor = ConsoleInput.lerDouble(sc,"Ola " + procura.getTitular() + " digite o valor: ");
+
+                try {
+                    if (op2 == 1) {
+                         service.processDeposito(procura, valor);
+                        System.out.println("[DEPOSITO CONCLUIDO] FINALIZADO!\n");
+                    } else if (op2 == 2) {
+                         service.processSaque(procura, valor);
+                        System.out.println("[SAQUE CONCLUIDO] FINALIZADO!\n");
+                    } else {
+                        long numeroContaTransf = ConsoleInput.lerLong(sc, "Digite o numero da conta para que deseja realizar a transferencia: ");
+                        Conta procuraTransf = repoContasSQL.buscarPorId(numeroContaTransf);
+                        if (procuraTransf == null){
+                            System.out.println("Conta destino nao encontrada");
+                            continue;
+                        }
+                        int escolhaTransf = ConsoleInput.lerInteiros(sc, "Desejar realizar uma transferencia para conta [" + procuraTransf.getTitular() + "] ? [1-SIM|2-CANCELAR]");
+                        if (escolhaTransf == 1) {
+                            service.processTransferencia(procura, valor, procuraTransf);
+                            System.out.println("[TRANSFERENCIA CONCLUIDO] FINALIZADO!\n");
+                        } else {
+                            System.out.println("OPERACAO CANCELADA!");
+                        }
+                    }
+                }catch (NegocioException e) {
+                    System.out.println("\n[AVISO DE NEGÃ“CIO] " + e.getMessage() + "\n");
+                } catch (DBException e) {
+                    System.out.println("\n[SISTEMA] Erro crÃ­tico no banco de dados. OperaÃ§Ã£o cancelada.\n");
+                }
+            }
+        }
+        emf.close();
+    }
+}
+package dao;
+import entities.Conta;
+
+public interface ContaDAO {
+    void salvar(Conta t);
+    Conta buscarPorId(Long id);
+
+}
+package dao;
+
+import entities.Transacao;
+
+import java.util.List;
+
+public interface TransacaoDAO {
+
+    public List<Transacao> extrato(Long id);
+}
+package dao.impl;
+
+import dao.ContaDAO;
+import entities.Conta;
+import jakarta.persistence.EntityManager;
+
+import java.sql.*;
+
+public class ContaDAOImpl implements ContaDAO {
+    private final EntityManager em;
+
+    public ContaDAOImpl(EntityManager em) {
+        this.em = em;
+    }
+
+    @Override
+    public void salvar(Conta t) {
+        em.persist(t);
+    }
+
+    @Override
+    public Conta buscarPorId(Long id) {
+        return em.find(Conta.class, id);
+    }
+}
+
+package dao.impl;
+
+import dao.TransacaoDAO;
+import entities.Transacao;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import java.sql.*;
+import java.util.List;
+
+public class TransacaoDAOImpl implements TransacaoDAO {
+    private final EntityManager em;
+
+    public TransacaoDAOImpl(EntityManager em) {
+        this.em = em;
+    }
+
+    public List<Transacao> extrato(Long id) {
+        String jpql = "SELECT t FROM Transacao t WHERE t.conta.idConta = :idParam ORDER BY t.data DESC";
+        TypedQuery<Transacao> query = em.createQuery(jpql, Transacao.class);
+        query.setParameter("idParam", id);
+        return query.getResultList();
+    }
+}
+package entities;
+
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Conta {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long idConta;
+    private String titular;
+    protected double balance;
+
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transacao> historicoTransacoes = new ArrayList<>();
+
+    public void addTransacao(Transacao transacao){
+        transacao.setConta(this);
+        historicoTransacoes.add(transacao);
+    }
+
+    public Conta(){}
+
+    public Conta(String titular, double balance) {
+        this.titular = titular;
+        this.balance = balance;
+    }
+    public Conta(Long idConta, String titular, double balance) {
+        this.idConta = idConta;
+        this.titular = titular;
+        this.balance = balance;
+    }
+    public double getBalance() {
+        return balance;
+    }
+    public abstract void sacar(double valor);
+    public abstract void deposito(double valor);
+    public abstract void transferencia( Double valor, Conta contaDestino);
+    public Long getIdConta() {
+        return idConta;
+    }
+    public String getTitular() {
+        return titular;
+    }
+    public entities.Transacao getUltimaTransacao() {
+        if (historicoTransacoes.isEmpty()) return null;
+        return historicoTransacoes.get(historicoTransacoes.size() - 1);
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Conta contas)) return false;
+        return Objects.equals(idConta, contas.idConta);
+    }
+    public void creditar(double valor){
+        balance += valor;
+    }
+
+    public void setIdConta(Long idConta) {
+        this.idConta = idConta;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idConta);
+    }
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("\ntitular= ").append(titular).append('\'');
+        sb.append("\nnumero= ").append(idConta);
+        sb.append("\nSaldo= ").append(balance);
+        sb.append("\n--- Transacoes ---\n");
+        for (entities.Transacao t : historicoTransacoes){
+            sb.append(t).append("\n");
+        }
+        return sb.toString();
+    }
+ }
+package entities;
+
+import enums.TipoOperacao;
+import exceptions.LimiteExcedidoException;
+import exceptions.SaldoInsuficienteException;
+import jakarta.persistence.Entity;
+import service.Tax;
+
+@Entity
+public class ContaCorrente extends Conta implements Tax {
+
+    public ContaCorrente(){}
+    public ContaCorrente(String titular, double balance) {
+        super(titular, balance);
+    }
+    public ContaCorrente(String titular,Long id, double balance){super(id,titular,balance);}
+
+    @Override
+    public void sacar(double valor){
+        double taxaCorrente = 25.00;
+        if (balance < valor + taxaCorrente) {
+            throw new SaldoInsuficienteException();
+        }
+        if (valor >= 20000){
+            throw new LimiteExcedidoException();
+        }
+        balance -= valor + taxaCorrente;
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance));
+    }
+    @Override
+    public void deposito(double valor){
+        if (tax(valor)+valor > 25000) {
+            throw new LimiteExcedidoException();
+        }
+        balance += valor - tax(valor);
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_DEPOSITO, valor, balance));
+    }
+    @Override
+    public void transferencia( Double valor, Conta contaDestino) {
+        if (balance >= valor + tax(valor)) {
+            balance -= valor + tax(valor);
+            contaDestino.creditar(valor);
+
+            addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, balance));
+            contaDestino.addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, contaDestino.getBalance()));
+        } else {
+            throw new SaldoInsuficienteException();
+        }
+    }
+
+    @Override
+    public double tax(double valor) {
+        return valor * 0.02;
+    }
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("\nConta [Corrente]\n");
+        sb.append(super.toString());
+        return sb.toString();
+    }
+}
+package entities;
+
+import enums.TipoOperacao;
+import exceptions.LimiteExcedidoException;
+import exceptions.SaldoInsuficienteException;
+import jakarta.persistence.Entity;
+import service.Tax;
+
+@Entity
+public final class  ContaEmpresarial extends Conta implements Tax {
+    private double emprestimo;
+
+    public ContaEmpresarial(){}
+    public ContaEmpresarial(String titular, long idConta, double balance, double emprestimo) {
+        super(idConta, titular,balance);
+        this.emprestimo = emprestimo;
+    }
+
+    public ContaEmpresarial(String titular, double balance, double emprestimo) {
+        super(titular, balance);
+        this.emprestimo = emprestimo;
+    }
+
+    @Override
+    public void sacar(double valor){
+        double taxaEmpresa = 50.00;
+        if (balance < valor + taxaEmpresa) {
+            throw new SaldoInsuficienteException();
+        }
+        if (valor > 20000){
+            throw new LimiteExcedidoException();
+        }
+        balance -= valor + taxaEmpresa;
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance));
+    }
+    @Override
+    public void deposito(double valor){
+
+        if (tax(valor) + valor > 35000) {
+            throw new LimiteExcedidoException();
+        }
+        balance += valor - tax(valor);
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_DEPOSITO, valor, balance));;
+    }
+
+
+    @Override
+    public void transferencia( Double valor, Conta contaDestino) {
+        if (balance >= valor + tax(valor)) {
+            balance -= valor + tax(valor);
+            contaDestino.creditar(valor);
+
+            addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, balance));
+            contaDestino.addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, contaDestino.getBalance()));
+        } else {
+            throw new SaldoInsuficienteException();
+        }
+    }
+
+    @Override
+    public double tax(double valor) {
+        return valor * 0.07;
+    }
+    public void addEmprestimo(double valor){
+        emprestimo += valor;
+    }
+    public double getEmprestimo() {
+        return emprestimo;
+    }
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("\nConta [Empresa]\n");
+        sb.append(super.toString());
+        sb.append("\nEmprestimo= ").append(emprestimo);
+        return sb.toString();
+    }
+}
+package entities;
+
+import enums.TipoOperacao;
+import exceptions.LimiteExcedidoException;
+import exceptions.SaldoInsuficienteException;
+import jakarta.persistence.Entity;
+import service.Tax;
+
+@Entity
+public final class ContaPoupanca extends Conta implements Tax {
+    private static final double JUROS_RENDIMENTO = 0.008;
+
+    public ContaPoupanca(){}
+    public ContaPoupanca(String titular, Long idConta, double balance) {
+        super(idConta,titular, balance);
+    }
+
+    public ContaPoupanca(String titular, double balance) {
+        super(titular, balance);
+    }
+
+    @Override
+    public void sacar(double valor){
+        if (balance < valor + tax(valor)) {
+            throw new SaldoInsuficienteException();
+        }
+        balance -= valor + tax(valor);
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_SAQUE, valor, balance));
+    }
+    @Override
+    public void deposito(double valor){
+        if (tax(valor) + valor > 10000) {
+            throw new LimiteExcedidoException();
+        }
+        balance += valor - tax(valor);
+        addTransacao(new Transacao(TipoOperacao.OPERACAO_DEPOSITO, valor, balance));
+    }
+
+    @Override
+    public void transferencia( Double valor, Conta contaDestino) {
+        if (balance >= valor + tax(valor)) {
+            balance -= valor + tax(valor);
+            contaDestino.creditar(valor);
+            addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, balance));
+            contaDestino.addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, contaDestino.getBalance()));
+        } else {
+            throw new SaldoInsuficienteException();
+        }
+    }
+    public double getRendimento(){
+        return balance * JUROS_RENDIMENTO;
+    }
+    @Override
+    public double tax(double valor) {
+        return valor * 0.005;
+    }
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("\nContas [Poupanca]\n");
+        sb.append(super.toString());
+        sb.append("\nRendimento previsto= ").append(balance * JUROS_RENDIMENTO);
+
+        return sb.toString();
+    }
+}
+package entities;
+
+import enums.TipoOperacao;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Entity
+public class Transacao{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long iD;
+    @Enumerated(EnumType.STRING)
+    private TipoOperacao tipoOperacao;
+    private double valor;
+    private double saldoApos;
+    private LocalDateTime data;
+
+    @ManyToOne
+    @JoinColumn(name = "id_conta")
+    private Conta conta;
+
+    public Transacao(TipoOperacao tipoOperacao, double valor, double saldoApos) {
+        this.tipoOperacao = tipoOperacao;
+        this.valor = valor;
+        this.saldoApos = saldoApos;
+        this.data = LocalDateTime.now();
+    }
+    public Transacao() {
+    }
+
+    public Conta getConta() {
+        return conta;
+    }
+
+    public void setConta(Conta conta) {
+        this.conta = conta;
+    }
+
+    public Transacao(Long iD, TipoOperacao tipoOperacao, double valor, double saldoApos , LocalDateTime data) {
+        this.iD = iD;
+        this.tipoOperacao = tipoOperacao;
+        this.valor = valor;
+        this.data = data;
+    }
+
+    public void setTipoOperacao(TipoOperacao tipoOperacao) {
+        this.tipoOperacao = tipoOperacao;
+    }
+
+    public Long getiD() {
+        return iD;
+    }
+
+    public void setiD(Long iD) {
+        this.iD = iD;
+    }
+
+    public LocalDateTime getData() {
+        return data;
+    }
+
+    public double getSaldoApos() {
+        return saldoApos;
+    }
+
+    public TipoOperacao getTipoOperacao() {
+        return tipoOperacao;
+    }
+
+    public double getValor() {
+        return valor;
+    }
+
+    public void setValor(double valor) {
+        this.valor = valor;
+    }
+
+    @Override
+    public String toString() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        final StringBuilder sb = new StringBuilder(" |tipoOperacao= ").append(tipoOperacao);
+        sb.append(" |valor= ").append(valor);
+        sb.append(" |saldoApos= ").append(saldoApos);
+        sb.append(" |data= ").append(data.format(fmt));
+        return sb.toString();
+    }
+
+    public void setData(LocalDateTime data) {
+        this.data = data;
+    }
+}
+package enums;
+
+public enum ErrorCode {
+    SALDO_BAIXO,
+    LIMITE_EXCEDIDO,
+    DB_EXCEPTION;
+}
+package enums;
+
+public enum TipoOperacao {
+    OPERACAO_DEPOSITO,
+    OPERACAO_SAQUE,
+    OPERACAO_TRANSFERENCIA;
+
+}
+package exceptions;
+
+import enums.ErrorCode;
+
+public class DBException extends  ValidacaoException{
+    public DBException() {
+        super(ErrorCode.DB_EXCEPTION, "Erro no DB");
+    }
+}
+package exceptions;
+
+public class DBIntegrityException extends RuntimeException {
+    public DBIntegrityException(String message) {
+        super(message);
+    }
+}
+package exceptions;
+
+import enums.ErrorCode;
+
+public class LimiteExcedidoException extends NegocioException {
+
+    public LimiteExcedidoException() {
+        super(ErrorCode.LIMITE_EXCEDIDO, "Valor excedeu o limite permitido");
+    }
+}
+package exceptions;
+
+import enums.ErrorCode;
+
+public class NegocioException extends RuntimeException {
+    private final ErrorCode codigo;
+
+    public NegocioException(ErrorCode codigo, String msg) {
+        super(msg);
+        this.codigo = codigo;
+    }
+
+    public ErrorCode getError() {
+        return codigo;
+    }
+}
+package exceptions;
+
+import enums.ErrorCode;
+
+public class SaldoInsuficienteException extends NegocioException{
+
+    public SaldoInsuficienteException() {
+        super(ErrorCode.SALDO_BAIXO, "Saldo insuficiente para concluir a operacao");
+    }
+}
+package exceptions;
+
+import enums.ErrorCode;
+
+public class ValidacaoException extends RuntimeException{
+    private final ErrorCode codigo;
+
+    public ValidacaoException(ErrorCode codigo, String msg){
+        super(msg);
+        this.codigo = codigo;
+    }
+    public ErrorCode getError(){
+        return codigo;
+    }
+}
+package factory;
+
+import entities.ContaCorrente;
+import entities.ContaEmpresarial;
+import entities.ContaPoupanca;
+import entities.Conta;
+
+public class ContaFactory {
+    public static Conta criarContaCorrente(String titular, double balance){
+        return new ContaCorrente(titular,balance);
+    }
+    public static Conta criarContaEmpresa(String titular, double balance, double emprestimo){
+        return new ContaEmpresarial(titular,balance,emprestimo);
+    }
+    public static Conta criarContaPoupanca(String titular, double balance){
+        return new ContaPoupanca(titular,balance);
+    }
+}
+package factory;
+
+import dao.ContaDAO;
+import dao.TransacaoDAO;
+import dao.impl.ContaDAOImpl;
+import dao.impl.TransacaoDAOImpl;
+import jakarta.persistence.EntityManager;
+
+public interface DaoFactory {
+    public static ContaDAO criarContaDAO(EntityManager em){
+        return new ContaDAOImpl(em);
+    }
+    public static TransacaoDAO criarTransDAO(EntityManager em){
+        return  new TransacaoDAOImpl(em);
+    }
+
+}
+package factory;
+
+import dao.ContaDAO;
+import jakarta.persistence.EntityManager;
+import service.OperacaoBanco;
+import service.impl.OperacaoBancoImpl;
+
+public interface OperacaoFactory {
+    public static OperacaoBanco operacaoBanco(ContaDAO contaDAO,EntityManager em){
+        return new OperacaoBancoImpl(contaDAO,em);
+    }
+}
+package service;
+
+import entities.Conta;
+
+public interface OperacaoBanco {
+    public void processDeposito(Conta conta, double valor);
+    public void processSaque(Conta conta, double valor);
+    public void processTransferencia(Conta contaOrigem, Double valorT, Conta contaDestino);
+}
+package service;
+
+public interface Tax {
+    double tax(double valor);
+}
+package service.impl;
+
+import dao.ContaDAO;
+import dao.TransacaoDAO;
+import entities.Conta;
+import entities.Transacao;
+import exceptions.DBException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
+import service.OperacaoBanco;
+
+public class OperacaoBancoImpl implements OperacaoBanco {
+    private final ContaDAO contaDAO;
+    private EntityManager em;
+
+    public OperacaoBancoImpl(ContaDAO contaDAO,EntityManager em) {
+        this.contaDAO = contaDAO;
+        this.em = em;
+
+    }
+    public void executarEmTransacao(Runnable operacao){
+        try {
+            em.getTransaction().begin();
+            operacao.run();
+            em.getTransaction().commit();
+        } catch (PersistenceException e) {
+            if (em.getTransaction() != null && em.getTransaction().isActive()){
+                em.getTransaction().rollback();
+            }
+            throw new DBException();
+        }
+    }
+    public void processDeposito(Conta conta, double valor) {
+        executarEmTransacao(()-> {
+            Conta contaGerenciada = em.merge(conta);
+            contaGerenciada.deposito(valor);
+        });
+    }
+    public void processSaque(Conta conta, double valor) {
+        executarEmTransacao(()-> {
+            Conta contaGerenciada = em.merge(conta);
+            contaGerenciada.sacar(valor);
+        });
+    }
+    public void processTransferencia(Conta contaOrigem, Double valorT, Conta contaDestino){
+        executarEmTransacao(()-> {
+            Conta origemGerenciada = em.merge(contaOrigem);
+            Conta destinoGerenciada = em.merge(contaDestino);
+            origemGerenciada.transferencia(valorT, destinoGerenciada);
+        });
+    }
+}
+package util;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class ConsoleInput {
+
+    public static int lerInteiros(Scanner sc, String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                int valor = sc.nextInt();
+                sc.nextLine();
+                return valor;
+            } catch (InputMismatchException e) {
+                System.out.println("Numero invalido");
+                sc.nextLine();
+            }
+        }
+    }
+    public static double lerDouble(Scanner sc, String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                double valorDouble = sc.nextDouble();
+                sc.nextLine();
+                return valorDouble;
+
+            } catch (InputMismatchException e) {
+                System.out.println("Numero invalido");
+                sc.nextLine();
+            }
+        }
+    }
+    public static String lerString(Scanner sc, String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                String entrada = sc.nextLine();
+                if (entrada.matches(".*\\d.*")) {
+                    throw new IllegalArgumentException("Erro: O nome so pode contar letras.");
+                } else if (entrada.trim().isEmpty()) {
+                    throw new IllegalArgumentException(("O nome nÃ£o pode ser vazio."));
+                } else {
+                    return entrada;
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Nome Invalido! " + e.getMessage());
+            }
+        }
+    }
+    public static long lerLong(Scanner sc, String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                long valor = sc.nextLong();
+                sc.nextLine();
+                return valor;
+            } catch (InputMismatchException e) {
+                System.out.println("Numero invalido");
+                sc.nextLine();
+            }
+        }
+    }
+}
+
+
+
+
+
+package util;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+public class ListUtils {
+    public ListUtils() {
+    }
+
+    public static void printLista(List<?> list) {
+        for (Object obj : list) {
+            System.out.println("\n" + obj);
+        }
+    }
+    public static <T extends Comparable<? super T>> void writeLista(List<T> list) {
+        String path = "C:\\temp\\bancoTeste.txt";
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path))) {
+            Collections.sort(list);
+            for (Object obj : list) {
+                bw.write(String.valueOf(obj));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> void copy(List<? extends T> origem, List<? super T> scr) {
+        scr.addAll(origem);
+    }
+}

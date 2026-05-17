@@ -1,5 +1,7 @@
 package exceptions;
 
+import enums.ErrorCode;
+
 public class ValidacaoException extends RuntimeException{
     private final ErrorCode codigo;
 

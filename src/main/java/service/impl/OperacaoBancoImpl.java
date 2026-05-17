@@ -1,45 +1,48 @@
 package service.impl;
 
 import dao.ContaDAO;
-import dao.TransacaoDAO;
 import entities.Conta;
-import entities.Transacao;
+import exceptions.DBException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 import service.OperacaoBanco;
-import main.entities.*;
 
 public class OperacaoBancoImpl implements OperacaoBanco {
-    private final ContaDAO contaDAO;
-    private final TransacaoDAO transacaoDAO;
+    private EntityManager em;
 
-    public OperacaoBancoImpl(ContaDAO contaDAO, TransacaoDAO transacaoDAO) {
-        this.contaDAO = contaDAO;
-        this.transacaoDAO = transacaoDAO;
+    public OperacaoBancoImpl(EntityManager em) {
+        this.em = em;
 
     }
-
-    public void processDeposito(Conta conta, double valor) {
-        conta.deposito(valor, conta.getIdConta());
-        Transacao t = conta.getUltimaTransacao();
-        if (t != null) {
-            transacaoDAO.salvar(t);
-            contaDAO.updateSaldo(conta.getIdConta(),conta.getBalance());
+    public void executarEmTransacao(Runnable operacao){
+        try {
+            em.getTransaction().begin();
+            operacao.run();
+            em.getTransaction().commit();
+        } catch (PersistenceException e) {
+            if (em.getTransaction() != null && em.getTransaction().isActive()){
+                em.getTransaction().rollback();
+            }
+            throw new DBException();
         }
+    }
+    public void processDeposito(Conta conta, double valor) {
+        executarEmTransacao(()-> {
+            Conta contaGerenciada = em.merge(conta);
+            contaGerenciada.deposito(valor);
+        });
     }
     public void processSaque(Conta conta, double valor) {
-        conta.sacar(valor, conta.getIdConta());
-        Transacao t = conta.getUltimaTransacao();
-        if (t != null) {
-            transacaoDAO.salvar(t);
-            contaDAO.updateSaldo(conta.getIdConta(),conta.getBalance());
-        }
+        executarEmTransacao(()-> {
+            Conta contaGerenciada = em.merge(conta);
+            contaGerenciada.sacar(valor);
+        });
     }
     public void processTransferencia(Conta contaOrigem, Double valorT, Conta contaDestino){
-        contaOrigem.transferencia(valorT,contaDestino);
-        Transacao tOrigem = contaOrigem.getUltimaTransacao();
-        Transacao tDestino = contaDestino.getUltimaTransacao();
-        if (tOrigem != null && tDestino != null){
-            transacaoDAO.salvar(tOrigem); transacaoDAO.salvar(tDestino);
-            contaDAO.transferenciaOperacao(contaOrigem,contaDestino);
-        }
+        executarEmTransacao(()-> {
+            Conta origemGerenciada = em.merge(contaOrigem);
+            Conta destinoGerenciada = em.merge(contaDestino);
+            origemGerenciada.transferencia(valorT, destinoGerenciada);
+        });
     }
 }

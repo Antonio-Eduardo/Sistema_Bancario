@@ -1,15 +1,16 @@
 package exceptions;
 
-public class NegocioException {
-    public static void executar(Runnable acao) {
-        try {
-            acao.run();
-        } catch (SaldoInsuficienteException e) {
-            System.out.println("[BANCO] Atenção: " + e.getMessage());
-        } catch (LimiteExcedidoException e ){
-            System.out.println("[BANCO] Atenção: " + e.getMessage());
-        }
+import enums.ErrorCode;
+
+public class NegocioException extends RuntimeException {
+    private final ErrorCode codigo;
+
+    public NegocioException(ErrorCode codigo, String msg) {
+        super(msg);
+        this.codigo = codigo;
     }
 
+    public ErrorCode getError() {
+        return codigo;
+    }
 }
-

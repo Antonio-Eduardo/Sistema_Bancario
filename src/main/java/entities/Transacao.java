@@ -2,16 +2,15 @@ package entities;
 
 import enums.TipoOperacao;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Entity
 public class Transacao{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long iD;
-    private String idTransacao;
+    @Enumerated(EnumType.STRING)
     private TipoOperacao tipoOperacao;
     private double valor;
     private double saldoApos;
@@ -21,14 +20,21 @@ public class Transacao{
     @JoinColumn(name = "id_conta")
     private Conta conta;
 
-    public Transacao(TipoOperacao tipoOperacao, double valor, double saldoApos, Long iD) {
+    public Transacao(TipoOperacao tipoOperacao, double valor, double saldoApos) {
         this.tipoOperacao = tipoOperacao;
         this.valor = valor;
         this.saldoApos = saldoApos;
-        this.iD = iD;
         this.data = LocalDateTime.now();
     }
     public Transacao() {
+    }
+
+    public Conta getConta() {
+        return conta;
+    }
+
+    public void setConta(Conta conta) {
+        this.conta = conta;
     }
 
     public Transacao(Long iD, TipoOperacao tipoOperacao, double valor, double saldoApos , LocalDateTime data) {
@@ -36,10 +42,6 @@ public class Transacao{
         this.tipoOperacao = tipoOperacao;
         this.valor = valor;
         this.data = data;
-    }
-
-    public String getIdTransacao() {
-        return idTransacao;
     }
 
     public void setTipoOperacao(TipoOperacao tipoOperacao) {
@@ -52,10 +54,6 @@ public class Transacao{
 
     public void setiD(Long iD) {
         this.iD = iD;
-    }
-
-    public void setIdTransacao(String idTransacao) {
-        this.idTransacao = idTransacao;
     }
 
     public LocalDateTime getData() {
