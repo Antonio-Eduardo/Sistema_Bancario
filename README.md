@@ -43,7 +43,7 @@ ordenadas de forma cronológica decrescente.
 
 - `main.entities` → classes das contas e transações
 - `main.dao` → interfaces DAO
-- `main.dao.impl` → implementação JDBC/MySQL
+- `main.dao.impl` → implementação JPA/Hibernate/JPQL
 - `services` → regras de negócio
 - `main.dao.db` → conexão com banco de dados
 - `main.exceptions` → tratamento de erros
