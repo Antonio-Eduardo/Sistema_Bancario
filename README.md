@@ -31,13 +31,13 @@ ordenadas de forma cronológica decrescente.
 - Limite excedido
 - Exceções de banco de dados
 
-### Persistência de dados
+### Persistência de Dados (Atualizado)
 
-- Persistência com MySQL utilizando JDBC
-- Controle transacional com:
-  - `commit`
-  - `rollback`
-  - `setAutoCommit(false)`
+- Persistência com MySQL utilizando JPA / Hibernate
+- Controle transacional automatizado via EntityManager:
+- em.getTransaction().begin() (Substitui o antigo setAutoCommit(false))
+- em.getTransaction().commit() (Grava as alterações de forma segura no banco)
+- em.getTransaction().rollback() (Desfaz as alterações em caso de erro/exceção)
 
 ## Estrutura
 
