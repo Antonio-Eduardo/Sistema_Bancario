@@ -50,7 +50,7 @@ public final class  ContaEmpresarial extends Conta implements Tax {
             balance -= valor + tax(valor);
             contaDestino.creditar(valor);
 
-            addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, balance));
+            addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, this.getBalance()));
             contaDestino.addTransacao(new Transacao(TipoOperacao.OPERACAO_TRANSFERENCIA, valor, contaDestino.getBalance()));
         } else {
             throw new SaldoInsuficienteException();

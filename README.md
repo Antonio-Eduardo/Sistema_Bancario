@@ -1,7 +1,11 @@
 # Sistema Bancário (Java)
 
-Projeto de um sistema bancário desenvolvido em Java com foco em Programação Orientada a Objetos, simulando operações básicas de uma instituição financeira. O projeto permite a criação e gerenciamento de contas, além da realização de transações como depósitos, saques e consultas de saldo.
+Projeto de um sistema bancário desenvolvido em Java com foco em POO e persistência de dados. simulando operações básicas de uma instituição financeira. 
+O projeto permite a criação e gerenciamento de contas, além da realização de transações como depósitos, saques e consultas de saldo.
 
+# Evolução do projeto
+O projeto nasceu como um sistema simples baseado em arquivos textuais (.txt). Posteriormente, evoluiu para uma arquitetura baseada em JDBC + MySQL e, 
+atualmente, utiliza a especificação JPA com mapeamento objeto-relacional e gerenciamento automático de transações.
 ## O que tem no projeto
 
 ### Criação de contas
@@ -18,7 +22,8 @@ Projeto de um sistema bancário desenvolvido em Java com foco em Programação O
 
 ### Histórico de transações
 
-- Cada operação é registrada no sistema
+- Mapeamento Bidirecional: Cada conta possui um histórico de transações vinculadas diretamente no banco de dados, 
+ordenadas de forma cronológica decrescente.
 
 ### Tratamento de erros
 
@@ -63,6 +68,7 @@ Projeto de um sistema bancário desenvolvido em Java com foco em Programação O
 - Injeção de Dependência
 - JDBC Transactions
 - Separação de responsabilidades
+- JPA / Hibernate
 
 ## Tecnologias utilizadas
 
@@ -70,6 +76,8 @@ Projeto de um sistema bancário desenvolvido em Java com foco em Programação O
 - JDBC
 - MySQL
 - Git/GitHub
+- JPA / Hibernate
+- Maven
 
 ## Exemplo de saída
 
@@ -93,16 +101,9 @@ TRANSFERENCIA | R$ 100.00 | Saldo: 250.00
 3. Ajustar as credenciais de conexão na classe `DB.java`
 4. Executar a classe `main.java.Main.java`
 
-## Observações
-
-Fiz esse projeto para praticar conceitos importantes de backend Java, como Programação Orientada a Objetos, JDBC, persistência de dados, arquitetura em camadas e controle transacional.
-
-O projeto começou como um sistema bancário simples utilizando arquivos `.txt` e evoluiu para uma arquitetura baseada em DAO + MySQL utilizando JDBC.
-
 ## Melhorias futuras
 
 - API REST com Spring Boot
-- Hibernate/JPA
 - Interface gráfica
 - Testes automatizados
 - Uso de BigDecimal para operações financeiras
